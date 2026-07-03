@@ -5,6 +5,8 @@
       "name": "Способность",
       "hero": "Герой",
       "winrate": "Винрейт",
+      "meleeWinrate": "Винрейт (ближний)",
+      "rangedWinrate": "Винрейт (дальний)",
       "hsWinrate": "HS Винрейт",
       "pickRate": "Пик рейт",
       "ultimate": "Ультимейт"

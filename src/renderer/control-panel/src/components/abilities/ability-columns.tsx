@@ -42,6 +42,20 @@ export function useAbilityColumns(
         cell: ({ row }) => pct(row.original.winrate),
       },
       {
+        accessorKey: 'meleeWinrate',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Melee Win Rate" />
+        ),
+        cell: ({ row }) => pct(row.original.meleeWinrate),
+      },
+      {
+        accessorKey: 'rangedWinrate',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Ranged Win Rate" />
+        ),
+        cell: ({ row }) => pct(row.original.rangedWinrate),
+      },
+      {
         accessorKey: 'highSkillWinrate',
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title="HS Win Rate" />

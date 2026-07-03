@@ -5,6 +5,8 @@
       "name": "Ability",
       "hero": "Hero",
       "winrate": "Win Rate",
+      "meleeWinrate": "Melee Win Rate",
+      "rangedWinrate": "Ranged Win Rate",
       "hsWinrate": "HS Win Rate",
       "pickRate": "Pick Rate",
       "ultimate": "Ultimate"
