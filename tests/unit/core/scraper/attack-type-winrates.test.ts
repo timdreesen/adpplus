@@ -1,83 +1,99 @@
 import { describe, it, expect } from 'vitest'
-import {
-  computeAbilityAttackTypeWinrates,
-  heroPairsToAttackTypePicks,
-  type HeroAbilityPickForAttackType,
-} from '@core/scraper/attack-type-winrates'
-import type { TransformedHeroAbilitySynergy } from '@core/scraper/types'
+import { buildAbilityLookup } from '@core/scraper/data-transformer'
+import type { AbilityLookup } from '@core/scraper/data-transformer'
+import { buildAttackTypeWinratesFromHeroAttributes } from '@core/scraper/attack-type-winrates'
+import type { WindrunAbilityHeroAttributeStats } from '@core/scraper/types'
 
-describe('computeAbilityAttackTypeWinrates', () => {
-  it('computes pick-weighted melee and ranged win rates per ability', () => {
-    const picks: HeroAbilityPickForAttackType[] = [
-      // Fury Swipes (owner: Ursa/70) drafted on melee Pudge (14)
-      { abilityName: 'ursa_fury_swipes', heroWindrunId: 14, abilityOwnerHeroId: 70, winrate: 0.6, numPicks: 100 },
-      // Fury Swipes drafted on ranged Sniper (35)
-      { abilityName: 'ursa_fury_swipes', heroWindrunId: 35, abilityOwnerHeroId: 70, winrate: 0.5, numPicks: 200 },
-    ]
+function stat(abilityId: number, winrate: number) {
+  return {
+    abilityId,
+    numPicks: 1000,
+    avgPickPosition: 5,
+    wins: Math.round(winrate * 1000),
+    winrate,
+    pickRate: 1,
+  }
+}
 
-    const result = computeAbilityAttackTypeWinrates(picks)
-    const fury = result.get('ursa_fury_swipes')
+const abilityLookup: AbilityLookup = buildAbilityLookup([
+  {
+    valveId: 656,
+    englishName: 'Hammer of Purity',
+    shortName: 'omniknight_hammer_of_purity',
+    ownerHeroId: 57,
+    hasScepter: false,
+    hasShard: false,
+  },
+  {
+    valveId: 5017,
+    englishName: 'Thirst',
+    shortName: 'brewmaster_thirst',
+    ownerHeroId: 78,
+    hasScepter: false,
+    hasShard: false,
+  },
+  {
+    valveId: 5359,
+    englishName: 'Fury Swipes',
+    shortName: 'ursa_fury_swipes',
+    ownerHeroId: 70,
+    hasScepter: false,
+    hasShard: true,
+  },
+])
 
-    expect(fury?.meleeWinrate).toBeCloseTo(0.6)
-    expect(fury?.rangedWinrate).toBeCloseTo(0.5)
+describe('buildAttackTypeWinratesFromHeroAttributes', () => {
+  it('maps Windrun melee/ranged attribute stats to ability short names', () => {
+    const stats: WindrunAbilityHeroAttributeStats = {
+      melee: {
+        '656': stat(656, 0.494),
+        '5017': stat(5017, 0.553),
+      },
+      ranged: {
+        '656': stat(656, 0.518),
+        '5017': stat(5017, 0.538),
+      },
+    }
+
+    const result = buildAttackTypeWinratesFromHeroAttributes(stats, abilityLookup)
+
+    expect(result.get('omniknight_hammer_of_purity')).toEqual({
+      meleeWinrate: 0.494,
+      rangedWinrate: 0.518,
+    })
+    expect(result.get('brewmaster_thirst')).toEqual({
+      meleeWinrate: 0.553,
+      rangedWinrate: 0.538,
+    })
   })
 
-  it('skips native kit picks (ability owner matches drafting hero)', () => {
-    const picks: HeroAbilityPickForAttackType[] = [
-      { abilityName: 'ursa_fury_swipes', heroWindrunId: 70, abilityOwnerHeroId: 70, winrate: 0.9, numPicks: 500 },
-      { abilityName: 'ursa_fury_swipes', heroWindrunId: 35, abilityOwnerHeroId: 70, winrate: 0.5, numPicks: 100 },
-    ]
+  it('returns null for a missing attack-type bucket', () => {
+    const stats: WindrunAbilityHeroAttributeStats = {
+      melee: {
+        '5359': stat(5359, 0.6),
+      },
+      ranged: {},
+    }
 
-    const result = computeAbilityAttackTypeWinrates(picks)
-    const fury = result.get('ursa_fury_swipes')
-
-    expect(fury?.meleeWinrate).toBeNull()
-    expect(fury?.rangedWinrate).toBeCloseTo(0.5)
-  })
-
-  it('returns null for attack-type buckets with no picks', () => {
-    const picks: HeroAbilityPickForAttackType[] = [
-      { abilityName: 'ursa_fury_swipes', heroWindrunId: 14, abilityOwnerHeroId: 70, winrate: 0.6, numPicks: 50 },
-    ]
-
-    const result = computeAbilityAttackTypeWinrates(picks)
+    const result = buildAttackTypeWinratesFromHeroAttributes(stats, abilityLookup)
     const fury = result.get('ursa_fury_swipes')
 
     expect(fury?.meleeWinrate).toBeCloseTo(0.6)
     expect(fury?.rangedWinrate).toBeNull()
   })
-})
 
-describe('heroPairsToAttackTypePicks', () => {
-  it('maps hero and ability names to windrun ids', () => {
-    const heroPairs: TransformedHeroAbilitySynergy[] = [
-      {
-        heroName: 'sniper',
-        abilityName: 'ursa_fury_swipes',
-        synergyWinrate: 0.55,
-        synergyIncrease: 0.05,
-        numPicks: 300,
-        isOp: false,
+  it('skips ability ids that are not in the static lookup', () => {
+    const stats: WindrunAbilityHeroAttributeStats = {
+      melee: {
+        '9999': stat(9999, 0.5),
       },
-    ]
-
-    const heroNameToWindrunId = new Map([['sniper', 35]])
-    const abilityNameToOwnerHeroId = new Map([['ursa_fury_swipes', 70]])
-
-    const picks = heroPairsToAttackTypePicks(
-      heroPairs,
-      heroNameToWindrunId,
-      abilityNameToOwnerHeroId,
-    )
-
-    expect(picks).toEqual([
-      {
-        abilityName: 'ursa_fury_swipes',
-        heroWindrunId: 35,
-        abilityOwnerHeroId: 70,
-        winrate: 0.55,
-        numPicks: 300,
+      ranged: {
+        '9999': stat(9999, 0.5),
       },
-    ])
+    }
+
+    const result = buildAttackTypeWinratesFromHeroAttributes(stats, abilityLookup)
+
+    expect(result.size).toBe(0)
   })
 })

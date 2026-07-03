@@ -2,7 +2,7 @@
 
 - **Top Heroes & Top Spells panels** — ranked overlay panels showing the best heroes and abilities by win rate in the current draft pool
 - **Hero spell tooltips** — hover hero portraits to see each hero's top four spells by win rate
-- **Melee & ranged win rates** — ability tooltips show overall, melee, and ranged win rates derived from Windrun hero-model data
+- **Melee & ranged win rates** — ability tooltips show overall, melee, and ranged win rates from Windrun's ability-hero-attributes endpoint
 - **Auto-detect picked heroes** — rescan compares hero model slots against the initial scan to update drafted status without manual toggles
 - **Picked ability tracking on rescan** — Rescan Picks ML-scans ability slots and crosses out drafted abilities across tooltips, OP/trap panels, and top lists
 

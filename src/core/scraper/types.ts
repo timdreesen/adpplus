@@ -110,6 +110,37 @@ export interface WindrunPatchesResponse {
   data: string[]
 }
 
+export interface WindrunAbilityHeroAttributeStat {
+  abilityId: number
+  numPicks: number
+  avgPickPosition: number
+  wins: number
+  ignored?: number
+  winrate: number
+  pickRate: number
+}
+
+export type WindrunAbilityHeroAttributeBucket = Record<
+  string,
+  WindrunAbilityHeroAttributeStat
+>
+
+export interface WindrunAbilityHeroAttributeStats {
+  str?: WindrunAbilityHeroAttributeBucket
+  agi?: WindrunAbilityHeroAttributeBucket
+  int?: WindrunAbilityHeroAttributeBucket
+  uni?: WindrunAbilityHeroAttributeBucket
+  melee: WindrunAbilityHeroAttributeBucket
+  ranged: WindrunAbilityHeroAttributeBucket
+}
+
+export interface WindrunAbilityHeroAttributesResponse {
+  data: {
+    patches?: { overall: string[] }
+    abilityHeroAttributeStats: WindrunAbilityHeroAttributeStats
+  }
+}
+
 // ── Transformer output types ─────────────────────────────────────────────────
 
 export interface TransformedHero {

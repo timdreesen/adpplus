@@ -7,12 +7,7 @@ import {
   buildWinrateMap,
   buildAbilityLookup,
 } from './data-transformer'
-import {
-  buildAbilityNameToOwnerHeroId,
-  buildHeroNameToWindrunId,
-  computeAbilityAttackTypeWinrates,
-  heroPairsToAttackTypePicks,
-} from './attack-type-winrates'
+import { buildAttackTypeWinratesFromHeroAttributes } from './attack-type-winrates'
 import { detectModelGaps } from '@core/ml/staleness-detector'
 import type { HeroRepository } from '@core/database/repositories/hero-repository'
 import type { AbilityRepository } from '@core/database/repositories/ability-repository'
@@ -118,9 +113,10 @@ export async function performFullScrape(
     // ── Phase 2: Pairs & Triplets ──────────────────────────────────────────
     onProgress({ phase: 'phase2', message: 'Fetching ability pairs and triplets...' })
 
-    const [pairsRes, tripletsRes] = await Promise.all([
+    const [pairsRes, tripletsRes, heroAttributesRes] = await Promise.all([
       deps.apiClient.fetchAbilityPairs(options.patch),
       deps.apiClient.fetchAbilityTriplets(options.patch),
+      deps.apiClient.fetchAbilityHeroAttributes(options.patch),
     ])
 
     // Use the abilityStats from the pairs response for synergy_increase calculation
@@ -176,12 +172,9 @@ export async function performFullScrape(
       heroNameToIdMap,
     )
 
-    const attackTypeWinrates = computeAbilityAttackTypeWinrates(
-      heroPairsToAttackTypePicks(
-        heroPairs,
-        buildHeroNameToWindrunId(staticHeroes),
-        buildAbilityNameToOwnerHeroId(abilityLookup),
-      ),
+    const attackTypeWinrates = buildAttackTypeWinratesFromHeroAttributes(
+      heroAttributesRes.data.abilityHeroAttributeStats,
+      abilityLookup,
     )
     deps.abilities.updateAttackTypeWinrates(attackTypeWinrates)
 

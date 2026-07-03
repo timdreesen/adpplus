@@ -66,6 +66,32 @@ function createMockApiClient(): WindrunApiClient {
         abilityTriplets: [],
       },
     }),
+    fetchAbilityHeroAttributes: vi.fn().mockResolvedValue({
+      data: {
+        abilityHeroAttributeStats: {
+          melee: {
+            '5359': {
+              abilityId: 5359,
+              numPicks: 1000,
+              avgPickPosition: 5,
+              wins: 540,
+              winrate: 0.54,
+              pickRate: 1,
+            },
+          },
+          ranged: {
+            '5359': {
+              abilityId: 5359,
+              numPicks: 1000,
+              avgPickPosition: 5,
+              wins: 560,
+              winrate: 0.56,
+              pickRate: 1,
+            },
+          },
+        },
+      },
+    }),
   }
 }
 
@@ -174,6 +200,18 @@ describe('performFullScrape', () => {
     expect(deps.triplets.clearAndInsertHeroAbilityTriplets).toHaveBeenCalledOnce()
   })
 
+  it('stores melee and ranged win rates from ability-hero-attributes', async () => {
+    await performFullScrape(deps, onProgress)
+
+    const winrates = (deps.abilities.updateAttackTypeWinrates as ReturnType<typeof vi.fn>).mock
+      .calls[0][0] as Map<string, { meleeWinrate: number | null; rangedWinrate: number | null }>
+
+    expect(winrates.get('ursa_fury_swipes')).toEqual({
+      meleeWinrate: 0.54,
+      rangedWinrate: 0.56,
+    })
+  })
+
   it('sets last scrape date on success', async () => {
     await performFullScrape(deps, onProgress)
 
@@ -192,6 +230,7 @@ describe('performFullScrape', () => {
     expect(client.fetchAbilityHighSkill).toHaveBeenCalledWith('7.40c')
     expect(client.fetchAbilityPairs).toHaveBeenCalledWith('7.40c')
     expect(client.fetchAbilityTriplets).toHaveBeenCalledWith('7.40c')
+    expect(client.fetchAbilityHeroAttributes).toHaveBeenCalledWith('7.40c')
   })
 
   it('returns error on API failure', async () => {

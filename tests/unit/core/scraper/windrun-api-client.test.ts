@@ -125,6 +125,42 @@ describe('WindrunApiClient', () => {
     expect(result.data.abilityTriplets[0].abilityIdOne).toBe(-70)
   })
 
+  it('fetchAbilityHeroAttributes returns melee and ranged ability stats', async () => {
+    const response = {
+      data: {
+        abilityHeroAttributeStats: {
+          melee: {
+            '656': {
+              abilityId: 656,
+              numPicks: 11088,
+              avgPickPosition: 9.1,
+              wins: 5478,
+              winrate: 0.494,
+              pickRate: 1,
+            },
+          },
+          ranged: {
+            '656': {
+              abilityId: 656,
+              numPicks: 10000,
+              avgPickPosition: 8.5,
+              wins: 5180,
+              winrate: 0.518,
+              pickRate: 1,
+            },
+          },
+        },
+      },
+    }
+    mockFetchJson(response)
+
+    const client = createWindrunApiClient('https://api.windrun.io/api/v2')
+    const result = await client.fetchAbilityHeroAttributes()
+
+    expect(result.data.abilityHeroAttributeStats.melee['656'].winrate).toBeCloseTo(0.494)
+    expect(result.data.abilityHeroAttributeStats.ranged['656'].winrate).toBeCloseTo(0.518)
+  })
+
   it('throws on HTTP error response', async () => {
     mockFetchError(500, 'Internal Server Error')
 
