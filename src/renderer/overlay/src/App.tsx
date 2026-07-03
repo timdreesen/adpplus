@@ -49,11 +49,6 @@ function App(): React.ReactElement {
   const [topHeroesPanelVisible, setTopHeroesPanelVisible] = useState(true)
   const [topSpellsPanelVisible, setTopSpellsPanelVisible] = useState(true)
 
-  const showTopSpellsPanel =
-    overlayData &&
-    !overlayData.scanData &&
-    overlayData.topSpellsByWinrate.length > 0
-
   // Escape key closes overlay
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent): void => {
@@ -175,8 +170,8 @@ function App(): React.ReactElement {
           />
         )}
 
-        {/* Top Spells by Winrate Panel (pre-scan) */}
-        {showTopSpellsPanel && (
+        {/* Top Spells in Draft Panel (post-scan) */}
+        {overlayData?.scanData && overlayData.topSpellsByWinrate.length > 0 && (
           <TopSpellsPanel
             spells={overlayData.topSpellsByWinrate}
             visible={topSpellsPanelVisible}

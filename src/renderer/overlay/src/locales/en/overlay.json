@@ -39,7 +39,7 @@
     "toggleDrafted": "Click to mark as drafted / available"
   },
   "topSpells": {
-    "title": "Top Spells by Winrate",
+    "title": "Top Spells in Draft",
     "show": "Show Top Spells",
     "hide": "Hide"
   },

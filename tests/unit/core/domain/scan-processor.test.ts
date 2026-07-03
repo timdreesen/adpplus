@@ -95,12 +95,8 @@ const mockDeps: ScanProcessorDeps = {
     getByHeroId(heroId: number) {
       return Object.values(abilityDb).filter((a) => a.heroId === heroId)
     },
-    getTopByWinrate(limit: number) {
-      return Object.values(abilityDb)
-        .filter((a) => a.winrate !== null)
-        .sort((a, b) => (b.winrate ?? 0) - (a.winrate ?? 0))
-        .slice(0, limit)
-        .map((a) => ({ displayName: a.displayName, winrate: a.winrate }))
+    getNameToIdMap() {
+      return new Map(Object.values(abilityDb).map((a) => [a.name, a.abilityId]))
     },
   },
   synergies: {
@@ -218,6 +214,17 @@ describe('processScanResults', () => {
       const { updatedState } = processScanResults(makeInitialScanInput())
       expect(updatedState.initialPoolAbilitiesCache.ultimates).toHaveLength(1)
       expect(updatedState.initialPoolAbilitiesCache.standard).toHaveLength(4)
+    })
+
+    it('populates top spells in draft sorted by winrate', () => {
+      const { overlayPayload } = processScanResults(makeInitialScanInput())
+      expect(overlayPayload.topSpellsByWinrate).toEqual([
+        { displayName: 'Laguna Blade', winrate: 0.6 },
+        { displayName: 'Fireball', winrate: 0.55 },
+        { displayName: 'Ice Blast', winrate: 0.52 },
+        { displayName: 'Blink', winrate: 0.5 },
+        { displayName: 'Firestorm', winrate: 0.48 },
+      ])
     })
 
     it('identifies hero models', () => {

@@ -20,7 +20,6 @@ import { registerDraftHandlers } from './draft-handlers'
 import { registerScraperHandlers } from './scraper-handlers'
 import { registerResolutionHandlers } from './resolution-handlers'
 import { loadApiConfig } from '../services/api-config'
-import { NUM_TOP_SPELLS_BY_WINRATE } from '@shared/constants/thresholds'
 
 // @DEV-GUIDE: Central IPC handler registration. All renderer↔main communication goes through
 // typed IPC channels following the domain:action naming convention (e.g. 'ml:scan', 'hero:getAll').
@@ -151,7 +150,7 @@ export function registerIpcHandlers(
       heroesParams: coords.heroes_params ?? { width: 0, height: 0 },
       modelsCoords: coords.models_coords ?? [],
       topHeroesByWinrate: [],
-      topSpellsByWinrate: dbService.abilities.getTopByWinrate(NUM_TOP_SPELLS_BY_WINRATE),
+      topSpellsByWinrate: [],
     }
 
     // Auto-detect game window and reposition overlay for windowed mode

@@ -1,4 +1,4 @@
-import type { AbilityDetail, ScanResult, AppSettings, HeroTopAbilityDisplay } from '@shared/types'
+import type { AbilityDetail, ScanResult, AppSettings } from '@shared/types'
 import type {
   SynergyPartner,
   AbilitySynergyPair,
@@ -96,7 +96,6 @@ export interface HeroLookup {
 export interface AbilityLookup {
   getDetails(names: string[]): Map<string, AbilityDetail>
   getByHeroId(heroId: number): AbilityDetail[]
-  getTopByWinrate(limit: number): HeroTopAbilityDisplay[]
 }
 
 export interface SynergyLookup {

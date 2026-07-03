@@ -95,28 +95,6 @@ describe('AbilityRepository', () => {
     })
   })
 
-  describe('getTopByWinrate', () => {
-    it('returns abilities sorted by winrate descending', () => {
-      const result = repo.getTopByWinrate(3)
-      expect(result).toHaveLength(3)
-      expect(result[0].displayName).toBe('Blink')
-      expect(result[0].winrate).toBe(0.6)
-      expect(result[1].displayName).toBe('Mana Void')
-      expect(result[1].winrate).toBe(0.58)
-      expect(result[2].displayName).toBe('Mana Break')
-      expect(result[2].winrate).toBe(0.55)
-    })
-
-    it('respects the limit parameter', () => {
-      expect(repo.getTopByWinrate(2)).toHaveLength(2)
-    })
-
-    it('returns empty array for non-positive limit', () => {
-      expect(repo.getTopByWinrate(0)).toEqual([])
-      expect(repo.getTopByWinrate(-1)).toEqual([])
-    })
-  })
-
   describe('updateAbilityMeta', () => {
     it('updates abilityOrder and isUltimate for existing abilities', () => {
       const count = repo.updateAbilityMeta([

@@ -30,7 +30,7 @@ import {
 } from './op-trap-filter'
 import { determineTopTierEntities } from './top-tier'
 import { getTopHeroesByWinrate } from './top-heroes-by-winrate'
-import { NUM_TOP_SPELLS_BY_WINRATE } from '@shared/constants/thresholds'
+import { getTopDraftSpellsByWinrate } from './top-draft-spells-by-winrate'
 
 // @DEV-GUIDE: Central business logic — transforms raw ML scan results into a fully-enriched
 // OverlayDataPayload for the overlay UI. This is pure TypeScript with ZERO Electron imports.
@@ -363,7 +363,11 @@ export function processScanResults(
     new Set(state.draftedHeroModelIds),
   )
 
-  const topSpellsByWinrate = deps.abilities.getTopByWinrate(NUM_TOP_SPELLS_BY_WINRATE)
+  const topSpellsByWinrate = getTopDraftSpellsByWinrate(
+    ultimates,
+    standard,
+    abilityDetailsMap,
+  )
 
   // --- Phase 14: Assemble overlay payload ---
   const overlayPayload: OverlayDataPayload = {
