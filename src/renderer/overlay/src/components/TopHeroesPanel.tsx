@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMousePassthrough } from '../hooks/use-mouse-passthrough'
+import { RescanPicksButton } from './RescanPicksButton'
 import type { TopHeroByWinrateDisplay } from '@shared/types'
 
 interface TopHeroesPanelProps {
@@ -21,26 +21,6 @@ export function TopHeroesPanel({
 }: TopHeroesPanelProps): React.ReactElement | null {
   const { t } = useTranslation()
   const { onMouseEnter, onMouseLeave } = useMousePassthrough()
-  const [isRescanning, setIsRescanning] = useState(false)
-  const [rescanError, setRescanError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const unsub = window.electronApi.on('draft:rescanPickedHeroes', (data) => {
-      setIsRescanning(false)
-      if (!data.success && data.error) {
-        setRescanError(data.error)
-      } else {
-        setRescanError(null)
-      }
-    })
-    return unsub
-  }, [])
-
-  const handleRescanPicks = (): void => {
-    setIsRescanning(true)
-    setRescanError(null)
-    window.electronApi.send('draft:rescanPickedHeroes')
-  }
 
   if (heroes.length === 0) return null
 
@@ -68,15 +48,7 @@ export function TopHeroesPanel({
       <div className="top-heroes-panel-header">
         <span className="top-heroes-panel-title">{t('topHeroes.title')}</span>
         <div className="top-heroes-panel-header-actions">
-          <button
-            className="overlay-btn overlay-btn-blue"
-            onClick={handleRescanPicks}
-            disabled={isRescanning}
-            style={{ minHeight: 28, padding: '4px 10px', fontSize: 12 }}
-            title={t('topHeroes.rescanPicksTooltip')}
-          >
-            {isRescanning ? t('topHeroes.rescanning') : t('topHeroes.rescanPicks')}
-          </button>
+          <RescanPicksButton variant="blue" />
           <button
             className="overlay-btn overlay-btn-blue"
             onClick={onToggle}
@@ -87,15 +59,11 @@ export function TopHeroesPanel({
         </div>
       </div>
 
-      {rescanError && (
-        <div className="top-heroes-panel-error">{rescanError}</div>
-      )}
-
       {heroes.map((hero) => (
         <button
           key={hero.heroId}
           type="button"
-          className={`top-heroes-panel-item${hero.isDrafted ? ' top-heroes-panel-item-drafted' : ''}`}
+          className={`top-heroes-panel-item${hero.isDrafted ? ' overlay-item-picked' : ''}`}
           onClick={() => {
             window.electronApi.send('draft:toggleHeroDrafted', {
               dbHeroId: hero.heroId,

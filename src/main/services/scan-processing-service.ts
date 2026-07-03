@@ -4,6 +4,7 @@ import type { DraftStore } from '../store/draft-store'
 import type { DatabaseService } from './database-service'
 import type { LayoutService } from './layout-service'
 import type { WindowManager } from './window-manager'
+import type { MlService } from './ml-service'
 import type { ScanResult, OverlayDataPayload } from '@shared/types'
 import type { InitialScanResults } from '@shared/types/ml'
 import { processScanResults } from '@core/domain/scan-processor'
@@ -14,6 +15,10 @@ import {
   type ModelSlotBaselines,
 } from '@core/domain/model-pick-detector'
 import { computeModelSlotStatsMap } from '@core/ml/slot-image-stats'
+import {
+  applyPickedAbilityFlags,
+  buildPickedDisplayNameSet,
+} from '@core/domain/picked-ability-enrichment'
 
 // @DEV-GUIDE: Bridges ML scan results to the overlay UI. After the ML worker returns raw
 // ability/hero detections, this service:
@@ -42,7 +47,13 @@ export interface ScanProcessingService {
   rescanPickedHeroes(
     screenshotBuffer: Buffer,
     resolution: string,
-  ): Promise<{ success: boolean; pickedCount: number; error?: string }>
+  ): Promise<{
+    success: boolean
+    pickedCount: number
+    pickedHeroCount: number
+    pickedAbilityCount: number
+    error?: string
+  }>
 }
 
 export function createScanProcessingService(
@@ -50,6 +61,7 @@ export function createScanProcessingService(
   dbService: DatabaseService,
   layoutService: LayoutService,
   windowManager: WindowManager,
+  mlService: MlService,
 ): ScanProcessingService {
   return {
     async handleScanResults(results, isInitialScan, resolution, scaleFactor, screenshotBuffer) {
@@ -70,6 +82,15 @@ export function createScanProcessingService(
             screenshotBuffer,
             coords.models_coords,
           )
+        }
+
+        if (isInitialScan) {
+          store.getState().setPickedAbilityNames([])
+        } else {
+          const pickedNames = (results as ScanResult[])
+            .map((slot) => slot.name)
+            .filter((name): name is string => name !== null)
+          store.getState().setPickedAbilityNames(pickedNames)
         }
 
         const output = processScanResults({
@@ -112,9 +133,18 @@ export function createScanProcessingService(
             output.updatedState.mySelectedModelHeroOrder,
         })
 
+        const pickedDisplayNames = buildPickedDisplayNameSet(
+          store.getState().pickedAbilityNames,
+          dbService.abilities.getDetails(store.getState().pickedAbilityNames),
+        )
+        const enrichedPayload = applyPickedAbilityFlags(
+          output.overlayPayload,
+          pickedDisplayNames,
+        )
+
         // Broadcast enriched data to both windows
-        lastOverlayPayload = output.overlayPayload
-        broadcastOverlayPayload(windowManager, output.overlayPayload)
+        lastOverlayPayload = enrichedPayload
+        broadcastOverlayPayload(windowManager, enrichedPayload)
 
         const durationMs = Math.round(performance.now() - start)
         logger.info('Scan processing complete', { durationMs, isInitialScan })
@@ -133,21 +163,32 @@ export function createScanProcessingService(
         new Set(state.draftedHeroModelIds),
       )
 
-      lastOverlayPayload = {
-        ...lastOverlayPayload,
-        topHeroesByWinrate,
-      }
+      const pickedDisplayNames = buildPickedDisplayNameSet(
+        state.pickedAbilityNames,
+        dbService.abilities.getDetails(state.pickedAbilityNames),
+      )
+
+      lastOverlayPayload = applyPickedAbilityFlags(
+        {
+          ...lastOverlayPayload,
+          topHeroesByWinrate,
+        },
+        pickedDisplayNames,
+      )
       broadcastOverlayPayload(windowManager, lastOverlayPayload)
     },
 
     async rescanPickedHeroes(screenshotBuffer, resolution) {
       const state = store.getState()
       const baselines = state.modelSlotBaselines
+      const scaleFactor = layoutService.getScaleFactor()
 
       if (Object.keys(baselines).length === 0) {
         return {
           success: false,
           pickedCount: 0,
+          pickedHeroCount: 0,
+          pickedAbilityCount: 0,
           error: 'No hero model baseline — run Initial Scan first',
         }
       }
@@ -156,6 +197,8 @@ export function createScanProcessingService(
         return {
           success: false,
           pickedCount: 0,
+          pickedHeroCount: 0,
+          pickedAbilityCount: 0,
           error: 'No identified heroes — run Initial Scan first',
         }
       }
@@ -165,11 +208,32 @@ export function createScanProcessingService(
         return {
           success: false,
           pickedCount: 0,
+          pickedHeroCount: 0,
+          pickedAbilityCount: 0,
           error: `No model slot coordinates for resolution: ${resolution}`,
         }
       }
 
       try {
+        let pickedAbilityCount = 0
+
+        if (mlService.isReady() && coords.selected_abilities_coords?.length) {
+          const mlResult = await mlService.scan(
+            screenshotBuffer,
+            coords,
+            false,
+          )
+          const pickedAbilities = mlResult.results as ScanResult[]
+          await this.handleScanResults(
+            pickedAbilities,
+            false,
+            resolution,
+            scaleFactor,
+            screenshotBuffer,
+          )
+          pickedAbilityCount = store.getState().pickedAbilityNames.length
+        }
+
         const currentStats = await computeModelSlotStatsMap(
           screenshotBuffer,
           coords.models_coords,
@@ -177,27 +241,40 @@ export function createScanProcessingService(
         const pickedOrders = detectPickedHeroOrders(baselines, currentStats)
         const pickedHeroIds = mapPickedOrdersToHeroIds(
           pickedOrders,
-          state.identifiedHeroModelsCache,
+          store.getState().identifiedHeroModelsCache,
         )
 
-        if (state.mySelectedModelDbHeroId !== null) {
-          pickedHeroIds.push(state.mySelectedModelDbHeroId)
+        if (store.getState().mySelectedModelDbHeroId !== null) {
+          pickedHeroIds.push(store.getState().mySelectedModelDbHeroId!)
         }
 
-        const uniquePickedIds = [...new Set(pickedHeroIds)]
-        store.getState().setDraftedHeroModelIds(uniquePickedIds)
+        const uniquePickedHeroIds = [...new Set(pickedHeroIds)]
+        store.getState().setDraftedHeroModelIds(uniquePickedHeroIds)
         this.refreshTopHeroesPanel()
 
-        logger.info('Picked hero rescan complete', {
-          pickedCount: uniquePickedIds.length,
+        const pickedHeroCount = uniquePickedHeroIds.length
+        logger.info('Picked draft rescan complete', {
+          pickedHeroCount,
+          pickedAbilityCount,
           pickedOrders,
         })
 
-        return { success: true, pickedCount: uniquePickedIds.length }
+        return {
+          success: true,
+          pickedCount: pickedHeroCount + pickedAbilityCount,
+          pickedHeroCount,
+          pickedAbilityCount,
+        }
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error)
-        logger.error('Picked hero rescan failed', { error: message })
-        return { success: false, pickedCount: 0, error: message }
+        logger.error('Picked draft rescan failed', { error: message })
+        return {
+          success: false,
+          pickedCount: 0,
+          pickedHeroCount: 0,
+          pickedAbilityCount: 0,
+          error: message,
+        }
       }
     },
   }

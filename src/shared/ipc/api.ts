@@ -129,6 +129,8 @@ export interface IpcOnMap {
   'draft:rescanPickedHeroes': {
     success: boolean
     pickedCount: number
+    pickedHeroCount?: number
+    pickedAbilityCount?: number
     error?: string
   }
   'feedback:snapshotStatus': { message: string; error?: boolean; allowRetry?: boolean }

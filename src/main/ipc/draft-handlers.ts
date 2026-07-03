@@ -5,7 +5,6 @@ import type { DraftStore } from '../store/draft-store'
 import type { WindowManager } from '../services/window-manager'
 import type { ScanProcessingService } from '../services/scan-processing-service'
 import type { ScreenshotService } from '../services/screenshot-service'
-import type { LayoutService } from '../services/layout-service'
 import type { WindowTrackerService } from '../services/window-tracker-service'
 import type { AppStore } from '../store/app-store'
 import { captureCroppedGameScreenshot } from '../services/game-screenshot'
@@ -89,6 +88,8 @@ export function registerDraftHandlers(
       broadcastRescanResult(windowManager, {
         success: false,
         pickedCount: 0,
+        pickedHeroCount: 0,
+        pickedAbilityCount: 0,
         error: 'No active resolution — overlay may not be activated',
       })
       return
@@ -111,6 +112,8 @@ export function registerDraftHandlers(
       broadcastRescanResult(windowManager, {
         success: false,
         pickedCount: 0,
+        pickedHeroCount: 0,
+        pickedAbilityCount: 0,
         error: message,
       })
     }
@@ -121,7 +124,13 @@ export function registerDraftHandlers(
 
 function broadcastRescanResult(
   wm: WindowManager,
-  data: { success: boolean; pickedCount: number; error?: string },
+  data: {
+    success: boolean
+    pickedCount: number
+    pickedHeroCount?: number
+    pickedAbilityCount?: number
+    error?: string
+  },
 ): void {
   broadcastToAll(wm, 'draft:rescanPickedHeroes', data)
 }

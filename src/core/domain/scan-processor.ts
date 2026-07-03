@@ -392,6 +392,7 @@ export function processScanResults(
     modelsCoords: modelCoords,
     topHeroesByWinrate,
     topSpellsByWinrate,
+    pickedAbilityDisplayNames: [],
   }
 
   return { overlayPayload, updatedState: state }
@@ -540,6 +541,7 @@ function enrichSlots(
       isSynergySuggestionForMySpot:
         topTier?.isSynergySuggestionForMySpot ?? false,
       isUltimateFromDb: details?.isUltimate ?? false,
+      isPicked: false,
       highWinrateCombinations: synergies?.high ?? [],
       lowWinrateCombinations: synergies?.low ?? [],
       strongHeroSynergies: heroSyn?.strong ?? [],
@@ -560,6 +562,7 @@ function makeUnknownSlot(slot: ScanResult): EnrichedScanSlot {
     isGeneralTopTier: false,
     isSynergySuggestionForMySpot: false,
     isUltimateFromDb: false,
+    isPicked: false,
     highWinrateCombinations: [],
     lowWinrateCombinations: [],
     strongHeroSynergies: [],

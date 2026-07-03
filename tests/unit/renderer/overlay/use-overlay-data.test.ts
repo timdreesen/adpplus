@@ -61,6 +61,7 @@ function makeOverlayPayload(overrides: Partial<OverlayDataPayload> = {}): Overla
     modelsCoords: [],
     topHeroesByWinrate: [],
     topSpellsByWinrate: [],
+    pickedAbilityDisplayNames: [],
     ...overrides,
   }
 }

@@ -122,6 +122,7 @@ app.whenReady().then(async () => {
     dbService,
     layoutService,
     windowManager,
+    mlService,
   )
 
   // @DEV-GUIDE: @zubridge bridge wires the Zustand AppStore in main to all subscribed

@@ -14,6 +14,10 @@ function formatWr(wr: number): string {
   return `${(wr * 100).toFixed(1)}%`
 }
 
+function pickedClass(isPicked?: boolean): string {
+  return isPicked ? ' overlay-item-picked' : ''
+}
+
 export function CombinationPanel({
   variant,
   abilityCombinations,
@@ -69,14 +73,19 @@ export function CombinationPanel({
       {abilityCombinations.map((combo, i) => (
         <div key={`a-${i}`} className="combination-panel-item">
           {itemPrefix}
-          <span className={combo.inflatedSynergy ? 'combination-panel-inflated' : ''}>
+          <span
+            className={`${combo.inflatedSynergy ? 'combination-panel-inflated' : ''}${pickedClass(combo.ability1IsPicked)}`}
+          >
             {combo.inflatedSynergy ? '~' : ''}{combo.ability1DisplayName}
           </span>{' '}
-          + <span>{combo.ability2DisplayName}</span>{' '}
+          +{' '}
+          <span className={pickedClass(combo.ability2IsPicked).trim()}>
+            {combo.ability2DisplayName}
+          </span>{' '}
           ({formatWr(combo.synergyWinrate)})
           {combo.suggestedThird && (
             <span
-              className="combination-panel-third"
+              className={`combination-panel-third${pickedClass(combo.suggestedThird.isPicked)}`}
               title={t('opCombinations.tripletTooltip', {
                 winrate: formatWr(combo.suggestedThird.tripletWinrate),
               })}
@@ -94,7 +103,10 @@ export function CombinationPanel({
       {heroSynergies.map((syn, i) => (
         <div key={`h-${i}`} className="combination-panel-item combination-panel-hero-synergy">
           {itemPrefix}
-          <span>{syn.heroDisplayName}</span> + <span>{syn.abilityDisplayName}</span>{' '}
+          <span>{syn.heroDisplayName}</span> +{' '}
+          <span className={pickedClass(syn.isAbilityPicked).trim()}>
+            {syn.abilityDisplayName}
+          </span>{' '}
           ({formatWr(syn.synergyWinrate)})
         </div>
       ))}

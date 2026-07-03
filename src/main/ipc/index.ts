@@ -151,6 +151,7 @@ export function registerIpcHandlers(
       modelsCoords: coords.models_coords ?? [],
       topHeroesByWinrate: [],
       topSpellsByWinrate: [],
+      pickedAbilityDisplayNames: [],
     }
 
     // Auto-detect game window and reposition overlay for windowed mode

@@ -605,6 +605,31 @@ body {
   opacity: 0.5;
 }
 
+.overlay-item-picked,
+.overlay-item-picked .top-heroes-panel-name,
+.overlay-item-picked .top-heroes-panel-wr,
+.overlay-item-picked .top-spells-panel-name,
+.overlay-item-picked .top-spells-panel-wr,
+.overlay-item-picked .top-spells-panel-rank {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.rescan-picks-control {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.rescan-picks-error {
+  font-size: 10px;
+  color: #ffb4a9;
+  margin-top: 4px;
+  max-width: 140px;
+  text-align: right;
+  line-height: 1.2;
+}
+
 /* ============================================================
    Top Spells Panel
    ============================================================ */
@@ -636,6 +661,13 @@ body {
   border-radius: 4px 4px 0 0;
   border-bottom: 2px solid rgba(45, 170, 150, 0.6);
   background: linear-gradient(to right, rgba(25, 70, 50, 0.5), rgba(33, 145, 128, 0.3));
+  gap: 8px;
+}
+
+.top-spells-panel-header-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .top-spells-panel-title {

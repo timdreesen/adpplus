@@ -56,6 +56,10 @@ function positionTooltip(el: HTMLDivElement, anchorRect: DOMRect): void {
   el.style.top = `${y}px`
 }
 
+function pickedClass(isPicked?: boolean): string {
+  return isPicked ? ' overlay-item-picked' : ''
+}
+
 export function Tooltip({ data, anchorRect }: TooltipProps): React.ReactElement | null {
   const { t } = useTranslation()
   const prevAnchorRef = useRef<DOMRect | null>(null)
@@ -111,7 +115,9 @@ function AbilityTooltipContent({
         </div>
       )}
 
-      <div className="tooltip-title">{slot.displayName}</div>
+      <div className={`tooltip-title${pickedClass(slot.isPicked)}`}>
+        {slot.displayName}
+      </div>
       <div className="tooltip-stat">
         {t('tooltip.winrateOverall', { value: formatWinrate(slot.winrate) })}
       </div>
@@ -221,7 +227,10 @@ function TopSpellsSection({
     <>
       <div className="tooltip-section-title">{title}</div>
       {items.map((item, i) => (
-        <div key={i} className="tooltip-combo tooltip-combo-hero">
+        <div
+          key={i}
+          className={`tooltip-combo tooltip-combo-hero${pickedClass(item.isPicked)}`}
+        >
           - {item.displayName}{' '}
           <span className="tooltip-combo-winrate">
             ({formatWinrate(item.winrate)} WR)
@@ -250,7 +259,7 @@ function HeroSynergySection({
       {items.slice(0, MAX_SYNERGIES).map((item, i) => (
         <div
           key={i}
-          className={`tooltip-combo tooltip-combo-hero${weak ? ' tooltip-combo-weak' : ''}`}
+          className={`tooltip-combo tooltip-combo-hero${weak ? ' tooltip-combo-weak' : ''}${pickedClass(item.isAbilityPicked)}`}
         >
           - {item[displayField]}{' '}
           <span className={weak ? 'tooltip-combo-weak' : 'tooltip-combo-winrate'}>
@@ -265,7 +274,10 @@ function HeroSynergySection({
 function renderAbilitySynergy(item: SynergyPairDisplay, i: number): React.ReactElement {
   return (
     <div key={i} className="tooltip-combo">
-      - {item.ability2DisplayName}{' '}
+      -{' '}
+      <span className={pickedClass(item.ability2IsPicked).trim()}>
+        {item.ability2DisplayName}
+      </span>{' '}
       <span className="tooltip-combo-winrate">
         ({formatSynergyWr(item.synergyWinrate)} WR)
       </span>
@@ -276,7 +288,10 @@ function renderAbilitySynergy(item: SynergyPairDisplay, i: number): React.ReactE
 function renderWeakAbilitySynergy(item: SynergyPairDisplay, i: number): React.ReactElement {
   return (
     <div key={i} className="tooltip-combo tooltip-combo-weak">
-      - {item.ability2DisplayName}{' '}
+      -{' '}
+      <span className={pickedClass(item.ability2IsPicked).trim()}>
+        {item.ability2DisplayName}
+      </span>{' '}
       <span className="tooltip-combo-weak">
         ({formatSynergyWr(item.synergyWinrate)} WR)
       </span>

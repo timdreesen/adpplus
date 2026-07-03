@@ -38,7 +38,7 @@
     "hide": "Hide",
     "rescanPicks": "Rescan Picks",
     "rescanning": "Scanning...",
-    "rescanPicksTooltip": "Rescan hero model slots to detect picked heroes",
+    "rescanPicksTooltip": "Rescan picked heroes and abilities from the draft screen",
     "toggleDrafted": "Click to mark as drafted / available"
   },
   "topSpells": {

@@ -20,6 +20,7 @@ export interface DraftSessionSlice {
   initialPoolAbilitiesCache: { ultimates: ScanResult[]; standard: ScanResult[] }
   identifiedHeroModelsCache: IdentifiedHeroModel[]
   draftedHeroModelIds: number[]
+  pickedAbilityNames: string[]
   modelSlotBaselines: ModelSlotBaselines
   mySelectedSpotDbId: number | null
   mySelectedSpotHeroOrder: number | null
@@ -39,6 +40,7 @@ export interface DraftStoreActions {
   markHeroDrafted(dbHeroId: number): void
   toggleHeroDrafted(dbHeroId: number): void
   setDraftedHeroModelIds(dbHeroIds: number[]): void
+  setPickedAbilityNames(names: string[]): void
   setModelSlotBaselines(baselines: ModelSlotBaselines): void
 }
 
@@ -50,6 +52,7 @@ export function createDraftStore() {
     initialPoolAbilitiesCache: { ultimates: [], standard: [] },
     identifiedHeroModelsCache: [],
     draftedHeroModelIds: [],
+    pickedAbilityNames: [],
     modelSlotBaselines: {},
     mySelectedSpotDbId: null,
     mySelectedSpotHeroOrder: null,
@@ -102,6 +105,9 @@ export function createDraftStore() {
 
     setDraftedHeroModelIds: (dbHeroIds) =>
       set({ draftedHeroModelIds: [...dbHeroIds] }),
+
+    setPickedAbilityNames: (names) =>
+      set({ pickedAbilityNames: [...names] }),
 
     setModelSlotBaselines: (baselines) =>
       set({ modelSlotBaselines: { ...baselines } }),

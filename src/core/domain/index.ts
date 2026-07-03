@@ -18,6 +18,10 @@ export {
   isModelSlotPicked,
   mapPickedOrdersToHeroIds,
 } from './model-pick-detector'
+export {
+  applyPickedAbilityFlags,
+  buildPickedDisplayNameSet,
+} from './picked-ability-enrichment'
 export { processScanResults } from './scan-processor'
 export type { ScanProcessorInput, ScanProcessorOutput } from './scan-processor'
 export type {

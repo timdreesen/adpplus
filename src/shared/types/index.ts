@@ -99,6 +99,7 @@ export interface EnrichedScanSlot extends ScanResult {
   isGeneralTopTier: boolean
   isSynergySuggestionForMySpot: boolean
   isUltimateFromDb: boolean
+  isPicked: boolean
   highWinrateCombinations: SynergyPairDisplay[]
   lowWinrateCombinations: SynergyPairDisplay[]
   strongHeroSynergies: HeroSynergyDisplay[]
@@ -127,6 +128,7 @@ export interface OverlayDataPayload {
   modelsCoords: SlotCoordinate[]
   topHeroesByWinrate: TopHeroByWinrateDisplay[]
   topSpellsByWinrate: HeroTopAbilityDisplay[]
+  pickedAbilityDisplayNames: string[]
 }
 
 export interface TopHeroByWinrateDisplay {
@@ -141,12 +143,15 @@ export interface ThirdAbilitySuggestion {
   displayName: string
   tripletWinrate: number
   tripletPicks: number
+  isPicked?: boolean
 }
 
 export interface SynergyPairDisplay {
   ability1DisplayName: string
   ability2DisplayName: string
   synergyWinrate: number
+  ability1IsPicked?: boolean
+  ability2IsPicked?: boolean
   suggestedThird?: ThirdAbilitySuggestion
   inflatedSynergy?: boolean
 }
@@ -155,11 +160,13 @@ export interface HeroSynergyDisplay {
   heroDisplayName: string
   abilityDisplayName: string
   synergyWinrate: number
+  isAbilityPicked?: boolean
 }
 
 export interface HeroTopAbilityDisplay {
   displayName: string
   winrate: number | null
+  isPicked?: boolean
 }
 
 export interface HeroModelDisplay {
