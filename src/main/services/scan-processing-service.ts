@@ -8,6 +8,12 @@ import type { ScanResult, OverlayDataPayload } from '@shared/types'
 import type { InitialScanResults } from '@shared/types/ml'
 import { processScanResults } from '@core/domain/scan-processor'
 import { getTopHeroesByWinrate } from '@core/domain/top-heroes-by-winrate'
+import {
+  detectPickedHeroOrders,
+  mapPickedOrdersToHeroIds,
+  type ModelSlotBaselines,
+} from '@core/domain/model-pick-detector'
+import { computeModelSlotStatsMap } from '@core/ml/slot-image-stats'
 
 // @DEV-GUIDE: Bridges ML scan results to the overlay UI. After the ML worker returns raw
 // ability/hero detections, this service:
@@ -30,8 +36,13 @@ export interface ScanProcessingService {
     isInitialScan: boolean,
     resolution: string,
     scaleFactor: number,
-  ): void
+    screenshotBuffer?: Buffer,
+  ): Promise<void>
   refreshTopHeroesPanel(): void
+  rescanPickedHeroes(
+    screenshotBuffer: Buffer,
+    resolution: string,
+  ): Promise<{ success: boolean; pickedCount: number; error?: string }>
 }
 
 export function createScanProcessingService(
@@ -41,7 +52,7 @@ export function createScanProcessingService(
   windowManager: WindowManager,
 ): ScanProcessingService {
   return {
-    handleScanResults(results, isInitialScan, resolution, scaleFactor) {
+    async handleScanResults(results, isInitialScan, resolution, scaleFactor, screenshotBuffer) {
       const start = performance.now()
 
       try {
@@ -51,6 +62,14 @@ export function createScanProcessingService(
         if (!coords) {
           logger.error('No layout coordinates for resolution', { resolution })
           return
+        }
+
+        if (isInitialScan && screenshotBuffer && coords.models_coords?.length) {
+          await storeModelSlotBaselines(
+            store,
+            screenshotBuffer,
+            coords.models_coords,
+          )
         }
 
         const output = processScanResults({
@@ -120,7 +139,83 @@ export function createScanProcessingService(
       }
       broadcastOverlayPayload(windowManager, lastOverlayPayload)
     },
+
+    async rescanPickedHeroes(screenshotBuffer, resolution) {
+      const state = store.getState()
+      const baselines = state.modelSlotBaselines
+
+      if (Object.keys(baselines).length === 0) {
+        return {
+          success: false,
+          pickedCount: 0,
+          error: 'No hero model baseline — run Initial Scan first',
+        }
+      }
+
+      if (state.identifiedHeroModelsCache.length === 0) {
+        return {
+          success: false,
+          pickedCount: 0,
+          error: 'No identified heroes — run Initial Scan first',
+        }
+      }
+
+      const coords = layoutService.getLayout(resolution)
+      if (!coords?.models_coords?.length) {
+        return {
+          success: false,
+          pickedCount: 0,
+          error: `No model slot coordinates for resolution: ${resolution}`,
+        }
+      }
+
+      try {
+        const currentStats = await computeModelSlotStatsMap(
+          screenshotBuffer,
+          coords.models_coords,
+        )
+        const pickedOrders = detectPickedHeroOrders(baselines, currentStats)
+        const pickedHeroIds = mapPickedOrdersToHeroIds(
+          pickedOrders,
+          state.identifiedHeroModelsCache,
+        )
+
+        if (state.mySelectedModelDbHeroId !== null) {
+          pickedHeroIds.push(state.mySelectedModelDbHeroId)
+        }
+
+        const uniquePickedIds = [...new Set(pickedHeroIds)]
+        store.getState().setDraftedHeroModelIds(uniquePickedIds)
+        this.refreshTopHeroesPanel()
+
+        logger.info('Picked hero rescan complete', {
+          pickedCount: uniquePickedIds.length,
+          pickedOrders,
+        })
+
+        return { success: true, pickedCount: uniquePickedIds.length }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        logger.error('Picked hero rescan failed', { error: message })
+        return { success: false, pickedCount: 0, error: message }
+      }
+    },
   }
+}
+
+async function storeModelSlotBaselines(
+  store: StoreApi<DraftStore>,
+  screenshotBuffer: Buffer,
+  modelCoords: import('@shared/types').SlotCoordinate[],
+): Promise<void> {
+  const statsMap = await computeModelSlotStatsMap(screenshotBuffer, modelCoords)
+  const baselines: ModelSlotBaselines = {}
+
+  for (const [heroOrder, stats] of statsMap) {
+    baselines[heroOrder] = stats
+  }
+
+  store.getState().setModelSlotBaselines(baselines)
 }
 
 function broadcastOverlayPayload(

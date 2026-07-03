@@ -99,6 +99,7 @@ export interface IpcSendMap {
   'draft:selectMySpot': { heroOrder: number; dbHeroId: number }
   'draft:selectMyModel': { heroOrder: number; dbHeroId: number }
   'draft:toggleHeroDrafted': { dbHeroId: number }
+  'draft:rescanPickedHeroes': void
   'app:openExternal': { url: string }
   'app:checkUpdate': void
   'app:downloadUpdate': void
@@ -125,6 +126,11 @@ export interface IpcOnMap {
   }
   'draft:selectMySpot': { selectedHeroOrderForDrafting: number | null }
   'draft:selectMyModel': { selectedModelHeroOrder: number | null }
+  'draft:rescanPickedHeroes': {
+    success: boolean
+    pickedCount: number
+    error?: string
+  }
   'feedback:snapshotStatus': { message: string; error?: boolean; allowRetry?: boolean }
   'feedback:exportStatus': { message: string; error?: boolean }
   'feedback:uploadStatus': { message: string; error?: boolean }

@@ -19,6 +19,7 @@ export const IpcChannels = {
   'draft:selectMySpot': 'draft:selectMySpot',
   'draft:selectMyModel': 'draft:selectMyModel',
   'draft:toggleHeroDrafted': 'draft:toggleHeroDrafted',
+  'draft:rescanPickedHeroes': 'draft:rescanPickedHeroes',
 
   // Settings domain
   'settings:get': 'settings:get',

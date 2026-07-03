@@ -1,5 +1,4 @@
 import { ipcMain } from 'electron'
-import sharp from 'sharp'
 import log from 'electron-log/main'
 import type { MlService } from '../services/ml-service'
 import type { LayoutService } from '../services/layout-service'
@@ -10,6 +9,7 @@ import type { WindowTrackerService } from '../services/window-tracker-service'
 import type { ScanResult } from '@shared/types'
 import type { InitialScanResults } from '@shared/types/ml'
 import type { AppStore } from '../store/app-store'
+import { captureCroppedGameScreenshot } from '../services/game-screenshot'
 
 // @DEV-GUIDE: ML domain IPC handlers. Two channels:
 // - ml:init (handle): Explicit re-init from UI retry button. Sets mlStatus in AppStore.
@@ -85,7 +85,10 @@ export function registerMlHandlers(
         }
 
         appStore.setState({ mlStatus: 'scanning' })
-        let screenshotBuffer = await screenshotService.capture(true)
+        const screenshotBuffer = await captureCroppedGameScreenshot(
+          screenshotService,
+          windowTracker,
+        )
 
         const layout = layoutService.getLayout(resolution)
         if (!layout) {
@@ -94,28 +97,6 @@ export function registerMlHandlers(
           })
           appStore.setState({ mlStatus: 'ready' })
           return
-        }
-
-        // In windowed mode, crop the full-screen screenshot to the game window
-        // so that JSON coordinates (relative to the game window) align correctly
-        const gameBounds = windowTracker.getGameWindowPhysicalBounds()
-        if (gameBounds) {
-          const meta = await sharp(screenshotBuffer).metadata()
-          const screenW = meta.width ?? 0
-          const screenH = meta.height ?? 0
-          if (
-            gameBounds.width < screenW ||
-            gameBounds.height < screenH
-          ) {
-            screenshotBuffer = await sharp(screenshotBuffer)
-              .extract({
-                left: gameBounds.x,
-                top: gameBounds.y,
-                width: gameBounds.width,
-                height: gameBounds.height,
-              })
-              .toBuffer()
-          }
         }
 
         const result = await mlService.scan(
@@ -134,11 +115,12 @@ export function registerMlHandlers(
 
         // Process and enrich scan results, then broadcast overlay:data
         const scaleFactor = layoutService.getScaleFactor()
-        scanProcessingService.handleScanResults(
+        await scanProcessingService.handleScanResults(
           result.results as InitialScanResults | ScanResult[],
           result.isInitialScan,
           resolution,
           scaleFactor,
+          screenshotBuffer,
         )
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error)

@@ -1,6 +1,7 @@
 import { createStore } from 'zustand/vanilla'
 import type { ScanResult } from '@shared/types'
 import type { IdentifiedHeroModel } from '@core/domain/types'
+import type { ModelSlotBaselines } from '@core/domain/model-pick-detector'
 
 // @DEV-GUIDE: Ephemeral draft session state, main-process-only (NOT synced via @zubridge).
 // Holds mutable caches and user selections that only exist during an active overlay session:
@@ -19,6 +20,7 @@ export interface DraftSessionSlice {
   initialPoolAbilitiesCache: { ultimates: ScanResult[]; standard: ScanResult[] }
   identifiedHeroModelsCache: IdentifiedHeroModel[]
   draftedHeroModelIds: number[]
+  modelSlotBaselines: ModelSlotBaselines
   mySelectedSpotDbId: number | null
   mySelectedSpotHeroOrder: number | null
   mySelectedModelDbHeroId: number | null
@@ -36,6 +38,8 @@ export interface DraftStoreActions {
   selectMyModel(dbHeroId: number | null, heroOrder: number | null): void
   markHeroDrafted(dbHeroId: number): void
   toggleHeroDrafted(dbHeroId: number): void
+  setDraftedHeroModelIds(dbHeroIds: number[]): void
+  setModelSlotBaselines(baselines: ModelSlotBaselines): void
 }
 
 export type DraftStore = DraftSessionSlice & DraftStoreActions
@@ -46,6 +50,7 @@ export function createDraftStore() {
     initialPoolAbilitiesCache: { ultimates: [], standard: [] },
     identifiedHeroModelsCache: [],
     draftedHeroModelIds: [],
+    modelSlotBaselines: {},
     mySelectedSpotDbId: null,
     mySelectedSpotHeroOrder: null,
     mySelectedModelDbHeroId: null,
@@ -57,6 +62,7 @@ export function createDraftStore() {
         initialPoolAbilitiesCache: { ultimates: [], standard: [] },
         identifiedHeroModelsCache: [],
         draftedHeroModelIds: [],
+        modelSlotBaselines: {},
         mySelectedSpotDbId: null,
         mySelectedSpotHeroOrder: null,
         mySelectedModelDbHeroId: null,
@@ -93,5 +99,11 @@ export function createDraftStore() {
           ? state.draftedHeroModelIds.filter((id) => id !== dbHeroId)
           : [...state.draftedHeroModelIds, dbHeroId],
       })),
+
+    setDraftedHeroModelIds: (dbHeroIds) =>
+      set({ draftedHeroModelIds: [...dbHeroIds] }),
+
+    setModelSlotBaselines: (baselines) =>
+      set({ modelSlotBaselines: { ...baselines } }),
   }))
 }

@@ -13,6 +13,11 @@ export {
 } from './op-trap-filter'
 export { determineTopTierEntities } from './top-tier'
 export { getTopHeroesByWinrate } from './top-heroes-by-winrate'
+export {
+  detectPickedHeroOrders,
+  isModelSlotPicked,
+  mapPickedOrdersToHeroIds,
+} from './model-pick-detector'
 export { processScanResults } from './scan-processor'
 export type { ScanProcessorInput, ScanProcessorOutput } from './scan-processor'
 export type {

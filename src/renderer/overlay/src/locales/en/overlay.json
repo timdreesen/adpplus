@@ -36,6 +36,9 @@
     "title": "Top Heroes",
     "show": "Show Heroes",
     "hide": "Hide",
+    "rescanPicks": "Rescan Picks",
+    "rescanning": "Scanning...",
+    "rescanPicksTooltip": "Rescan hero model slots to detect picked heroes",
     "toggleDrafted": "Click to mark as drafted / available"
   },
   "topSpells": {

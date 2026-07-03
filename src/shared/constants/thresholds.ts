@@ -14,6 +14,11 @@ export const MAX_PICK_ORDER_FOR_NORMALIZATION = 50.0
 export const NUM_TOP_TIER_SUGGESTIONS = 10
 export const NUM_TOP_SPELLS_BY_WINRATE = 10
 
+// Hero model pick detection (pixel analysis on model strip slots)
+export const MODEL_SLOT_PICKED_LUMINANCE_RATIO = 0.82
+export const MODEL_SLOT_PICKED_SATURATION_RATIO = 0.7
+export const MODEL_SLOT_MIN_LUMINANCE_DROP = 15
+
 // Default thresholds
 export const DEFAULT_OP_THRESHOLD = 0.13
 export const DEFAULT_TRAP_THRESHOLD = 0.05

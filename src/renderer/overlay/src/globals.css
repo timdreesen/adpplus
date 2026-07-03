@@ -546,6 +546,20 @@ body {
   border-radius: 4px 4px 0 0;
   border-bottom: 2px solid rgba(60, 100, 150, 0.6);
   background: linear-gradient(to right, rgba(30, 58, 95, 0.5), rgba(41, 78, 122, 0.3));
+  gap: 8px;
+}
+
+.top-heroes-panel-header-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.top-heroes-panel-error {
+  font-size: 11px;
+  color: #ffb4a9;
+  margin-bottom: 8px;
+  padding: 0 5px;
 }
 
 .top-heroes-panel-title {

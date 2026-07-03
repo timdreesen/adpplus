@@ -213,8 +213,15 @@ export function registerIpcHandlers(
     windowTracker,
   )
 
-  // Draft domain (My Spot, My Model)
-  registerDraftHandlers(draftStore, windowManager, scanProcessingService)
+  // Draft domain (My Spot, My Model, picked hero rescan)
+  registerDraftHandlers(
+    draftStore,
+    windowManager,
+    scanProcessingService,
+    screenshotService,
+    windowTracker,
+    appStore,
+  )
 
   // Scraper domain
   registerScraperHandlers(scraperService)
