@@ -20,6 +20,8 @@ function makeDetail(name: string, displayName: string, winrate: number | null): 
     displayName,
     heroId: 1,
     winrate,
+    meleeWinrate: null,
+    rangedWinrate: null,
     highSkillWinrate: null,
     pickRate: 10,
     hsPickRate: null,

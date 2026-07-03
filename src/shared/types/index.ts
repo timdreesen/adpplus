@@ -15,6 +15,8 @@ export interface AbilityDetail {
   displayName: string
   heroId: number
   winrate: number | null
+  meleeWinrate: number | null
+  rangedWinrate: number | null
   highSkillWinrate: number | null
   pickRate: number | null
   hsPickRate: number | null
@@ -90,6 +92,8 @@ export interface ScanResult {
 export interface EnrichedScanSlot extends ScanResult {
   displayName: string
   winrate: number | null
+  meleeWinrate: number | null
+  rangedWinrate: number | null
   pickRate: number | null
   consolidatedScore: number
   isGeneralTopTier: boolean

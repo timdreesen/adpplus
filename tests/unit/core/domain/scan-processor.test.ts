@@ -38,27 +38,32 @@ function makeCoord(heroOrder: number): SlotCoordinate {
 const abilityDb: Record<string, AbilityDetail> = {
   fireball: {
     abilityId: 1, name: 'fireball', displayName: 'Fireball',
-    heroId: 1, winrate: 0.55, highSkillWinrate: 0.57,
+    heroId: 1, winrate: 0.55, meleeWinrate: 0.54, rangedWinrate: 0.56,
+    highSkillWinrate: 0.57,
     pickRate: 10, hsPickRate: 8, isUltimate: false, abilityOrder: 0,
   },
   ice_blast: {
     abilityId: 2, name: 'ice_blast', displayName: 'Ice Blast',
-    heroId: 2, winrate: 0.52, highSkillWinrate: 0.54,
+    heroId: 2, winrate: 0.52, meleeWinrate: null, rangedWinrate: 0.52,
+    highSkillWinrate: 0.54,
     pickRate: 15, hsPickRate: 12, isUltimate: false, abilityOrder: 1,
   },
   laguna_blade: {
     abilityId: 3, name: 'laguna_blade', displayName: 'Laguna Blade',
-    heroId: 1, winrate: 0.60, highSkillWinrate: 0.62,
+    heroId: 1, winrate: 0.60, meleeWinrate: 0.58, rangedWinrate: 0.62,
+    highSkillWinrate: 0.62,
     pickRate: 5, hsPickRate: 3, isUltimate: true, abilityOrder: 3,
   },
   firestorm: {
     abilityId: 4, name: 'firestorm', displayName: 'Firestorm',
-    heroId: 1, winrate: 0.48, highSkillWinrate: 0.50,
+    heroId: 1, winrate: 0.48, meleeWinrate: 0.47, rangedWinrate: 0.49,
+    highSkillWinrate: 0.50,
     pickRate: 25, hsPickRate: 22, isUltimate: false, abilityOrder: 2,
   },
   blink: {
     abilityId: 5, name: 'blink', displayName: 'Blink',
-    heroId: 3, winrate: 0.50, highSkillWinrate: 0.52,
+    heroId: 3, winrate: 0.50, meleeWinrate: 0.50, rangedWinrate: null,
+    highSkillWinrate: 0.52,
     pickRate: 20, hsPickRate: 18, isUltimate: false, abilityOrder: 2,
   },
 }

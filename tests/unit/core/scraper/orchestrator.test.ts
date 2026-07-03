@@ -83,6 +83,7 @@ function createMockDeps(apiClient?: WindrunApiClient): ScraperDeps {
       getNameToIdMap: vi.fn().mockReturnValue(new Map([['ursa_fury_swipes', 100]])),
       getAllNames: vi.fn().mockReturnValue(['ursa_fury_swipes']),
       updateAbilityMeta: vi.fn().mockReturnValue(1),
+      updateAttackTypeWinrates: vi.fn(),
       getAll: vi.fn().mockReturnValue([]),
       getById: vi.fn(),
       getByName: vi.fn(),
@@ -168,6 +169,7 @@ describe('performFullScrape', () => {
 
     expect(deps.synergies.clearAndInsertAbilitySynergies).toHaveBeenCalledOnce()
     expect(deps.synergies.clearAndInsertHeroAbilitySynergies).toHaveBeenCalledOnce()
+    expect(deps.abilities.updateAttackTypeWinrates).toHaveBeenCalledOnce()
     expect(deps.triplets.clearAndInsertAbilityTriplets).toHaveBeenCalledOnce()
     expect(deps.triplets.clearAndInsertHeroAbilityTriplets).toHaveBeenCalledOnce()
   })

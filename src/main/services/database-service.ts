@@ -211,6 +211,8 @@ export function runColumnMigrations(db: SqlJsDatabase): void {
     { table: 'HeroAbilitySynergies', column: 'synergy_increase', definition: 'REAL' },
     { table: 'AbilityTriplets', column: 'synergy_increase', definition: 'REAL' },
     { table: 'HeroAbilityTriplets', column: 'synergy_increase', definition: 'REAL' },
+    { table: 'Abilities', column: 'melee_winrate', definition: 'REAL' },
+    { table: 'Abilities', column: 'ranged_winrate', definition: 'REAL' },
   ]
 
   for (const { table, column, definition } of columnMigrations) {

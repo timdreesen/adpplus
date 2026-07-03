@@ -52,6 +52,9 @@
   "changeMyModel": "Change",
   "tooltip": {
     "winrate": "Winrate: {{value}}",
+    "winrateOverall": "Overall: {{value}}",
+    "winrateMelee": "Melee: {{value}}",
+    "winrateRanged": "Ranged: {{value}}",
     "pickRate": "Pick Rate: {{value}}",
     "strongSynergies": "Strong Synergies",
     "heroSynergies": "Hero Synergies",

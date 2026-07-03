@@ -52,6 +52,9 @@
   "changeMyModel": "Изменить",
   "tooltip": {
     "winrate": "Винрейт: {{value}}",
+    "winrateOverall": "Общий: {{value}}",
+    "winrateMelee": "Ближний: {{value}}",
+    "winrateRanged": "Дальний: {{value}}",
     "pickRate": "Пикрейт: {{value}}",
     "strongSynergies": "Сильные синергии",
     "heroSynergies": "Синергии героев",

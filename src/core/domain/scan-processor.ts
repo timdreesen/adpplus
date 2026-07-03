@@ -529,6 +529,8 @@ function enrichSlots(
       ...slot,
       displayName: details?.displayName ?? slot.name,
       winrate: details?.winrate ?? null,
+      meleeWinrate: details?.meleeWinrate ?? null,
+      rangedWinrate: details?.rangedWinrate ?? null,
       pickRate: details?.pickRate ?? null,
       consolidatedScore: scored?.consolidatedScore ?? calculateConsolidatedScore(
         details?.winrate ?? null,
@@ -551,6 +553,8 @@ function makeUnknownSlot(slot: ScanResult): EnrichedScanSlot {
     ...slot,
     displayName: 'Unknown Ability',
     winrate: null,
+    meleeWinrate: null,
+    rangedWinrate: null,
     pickRate: null,
     consolidatedScore: 0,
     isGeneralTopTier: false,

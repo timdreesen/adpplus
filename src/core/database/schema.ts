@@ -39,6 +39,8 @@ export const abilities = sqliteTable(
     hsPickRate: real('hs_pick_rate'),
     isUltimate: integer('is_ultimate', { mode: 'boolean' }),
     abilityOrder: integer('ability_order'),
+    meleeWinrate: real('melee_winrate'),
+    rangedWinrate: real('ranged_winrate'),
   },
   (table) => [index('idx_abilities_hero_id').on(table.heroId)],
 )
@@ -170,7 +172,9 @@ export const SCHEMA_SQL = `
     pick_rate REAL,
     hs_pick_rate REAL,
     is_ultimate INTEGER,
-    ability_order INTEGER
+    ability_order INTEGER,
+    melee_winrate REAL,
+    ranged_winrate REAL
   );
   CREATE INDEX IF NOT EXISTS idx_abilities_hero_id ON Abilities (hero_id);
 

@@ -113,7 +113,13 @@ function AbilityTooltipContent({
 
       <div className="tooltip-title">{slot.displayName}</div>
       <div className="tooltip-stat">
-        {t('tooltip.winrate', { value: formatWinrate(slot.winrate) })}
+        {t('tooltip.winrateOverall', { value: formatWinrate(slot.winrate) })}
+      </div>
+      <div className="tooltip-stat">
+        {t('tooltip.winrateMelee', { value: formatWinrate(slot.meleeWinrate) })}
+      </div>
+      <div className="tooltip-stat">
+        {t('tooltip.winrateRanged', { value: formatWinrate(slot.rangedWinrate) })}
       </div>
       <div className="tooltip-stat">
         {t('tooltip.pickRate', { value: formatPickRate(slot.pickRate) })}

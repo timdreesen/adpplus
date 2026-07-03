@@ -96,6 +96,20 @@ describe('runColumnMigrations', () => {
     db.close()
   })
 
+  it('adds melee_winrate and ranged_winrate to Abilities on a v1 database', () => {
+    const db = new SQL.Database()
+    db.run(V1_SCHEMA_SQL)
+
+    expect(getColumns(db, 'Abilities')).not.toContain('melee_winrate')
+    expect(getColumns(db, 'Abilities')).not.toContain('ranged_winrate')
+
+    runColumnMigrations(db)
+
+    expect(getColumns(db, 'Abilities')).toContain('melee_winrate')
+    expect(getColumns(db, 'Abilities')).toContain('ranged_winrate')
+    db.close()
+  })
+
   it('does not fail when synergy_increase already exists (idempotent)', () => {
     const db = new SQL.Database()
     db.run(SCHEMA_SQL) // full current schema already has the column

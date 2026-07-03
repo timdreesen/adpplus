@@ -7,6 +7,12 @@ import {
   buildWinrateMap,
   buildAbilityLookup,
 } from './data-transformer'
+import {
+  buildAbilityNameToOwnerHeroId,
+  buildHeroNameToWindrunId,
+  computeAbilityAttackTypeWinrates,
+  heroPairsToAttackTypePicks,
+} from './attack-type-winrates'
 import { detectModelGaps } from '@core/ml/staleness-detector'
 import type { HeroRepository } from '@core/database/repositories/hero-repository'
 import type { AbilityRepository } from '@core/database/repositories/ability-repository'
@@ -169,6 +175,15 @@ export async function performFullScrape(
       abilityNameToIdMap,
       heroNameToIdMap,
     )
+
+    const attackTypeWinrates = computeAbilityAttackTypeWinrates(
+      heroPairsToAttackTypePicks(
+        heroPairs,
+        buildHeroNameToWindrunId(staticHeroes),
+        buildAbilityNameToOwnerHeroId(abilityLookup),
+      ),
+    )
+    deps.abilities.updateAttackTypeWinrates(attackTypeWinrates)
 
     deps.triplets.clearAndInsertAbilityTriplets(
       abilityTriplets,

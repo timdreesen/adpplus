@@ -30,6 +30,7 @@ export interface AbilityRepository {
   getNameToIdMap(): Map<string, number>
   getAllNames(): string[]
   updateAbilityMeta(updates: Array<{ name: string; abilityOrder: number; isUltimate: boolean }>): number
+  updateAttackTypeWinrates(winrates: Map<string, { meleeWinrate: number | null; rangedWinrate: number | null }>): void
 }
 
 function mapRow(row: typeof abilities.$inferSelect): AbilityDetail {
@@ -39,6 +40,8 @@ function mapRow(row: typeof abilities.$inferSelect): AbilityDetail {
     displayName: row.displayName ?? row.name,
     heroId: row.heroId ?? 0,
     winrate: row.winrate,
+    meleeWinrate: row.meleeWinrate,
+    rangedWinrate: row.rangedWinrate,
     highSkillWinrate: row.highSkillWinrate,
     pickRate: row.pickRate,
     hsPickRate: row.hsPickRate,
@@ -153,6 +156,24 @@ export function createAbilityRepository(db: SQLJsDatabase): AbilityRepository {
         updated += 1
       }
       return updated
+    },
+
+    updateAttackTypeWinrates(
+      winrates: Map<string, { meleeWinrate: number | null; rangedWinrate: number | null }>,
+    ): void {
+      db.update(abilities)
+        .set({ meleeWinrate: null, rangedWinrate: null })
+        .run()
+
+      for (const [name, rates] of winrates) {
+        db.update(abilities)
+          .set({
+            meleeWinrate: rates.meleeWinrate,
+            rangedWinrate: rates.rangedWinrate,
+          })
+          .where(eq(abilities.name, name))
+          .run()
+      }
     },
   }
 }
