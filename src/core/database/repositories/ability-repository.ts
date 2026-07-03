@@ -1,7 +1,7 @@
-import { eq, inArray, sql } from 'drizzle-orm'
+import { desc, eq, inArray, isNotNull, sql } from 'drizzle-orm'
 import type { SQLJsDatabase } from 'drizzle-orm/sql-js'
 import { abilities } from '../schema'
-import type { AbilityDetail } from '@shared/types'
+import type { AbilityDetail, HeroTopAbilityDisplay } from '@shared/types'
 
 // @DEV-GUIDE: Ability CRUD repository. Key methods:
 // - getDetails(names[]): Batch lookup by internal name, returns Map<name, AbilityDetail>.
@@ -26,6 +26,7 @@ export interface AbilityRepository {
   getAll(): AbilityDetail[]
   getDetails(names: string[]): Map<string, AbilityDetail>
   getByHeroId(heroId: number): AbilityDetail[]
+  getTopByWinrate(limit: number): HeroTopAbilityDisplay[]
   upsertAbilities(batch: AbilityUpsertData[], heroNameToIdMap: Map<string, number>): void
   getNameToIdMap(): Map<string, number>
   getAllNames(): string[]
@@ -82,6 +83,22 @@ export function createAbilityRepository(db: SQLJsDatabase): AbilityRepository {
         .orderBy(abilities.abilityOrder)
         .all()
         .map(mapRow)
+    },
+
+    getTopByWinrate(limit: number) {
+      if (limit <= 0) return []
+
+      return db
+        .select()
+        .from(abilities)
+        .where(isNotNull(abilities.winrate))
+        .orderBy(desc(abilities.winrate))
+        .limit(limit)
+        .all()
+        .map((row) => ({
+          displayName: row.displayName ?? row.name,
+          winrate: row.winrate,
+        }))
     },
 
     upsertAbilities(batch: AbilityUpsertData[], heroNameToIdMap: Map<string, number>): void {

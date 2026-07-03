@@ -92,6 +92,16 @@ const mockDeps: ScanProcessorDeps = {
       }
       return map
     },
+    getByHeroId(heroId: number) {
+      return Object.values(abilityDb).filter((a) => a.heroId === heroId)
+    },
+    getTopByWinrate(limit: number) {
+      return Object.values(abilityDb)
+        .filter((a) => a.winrate !== null)
+        .sort((a, b) => (b.winrate ?? 0) - (a.winrate ?? 0))
+        .slice(0, limit)
+        .map((a) => ({ displayName: a.displayName, winrate: a.winrate }))
+    },
   },
   synergies: {
     getHighWinrateCombinations(): SynergyPartner[] {
@@ -132,6 +142,7 @@ function makeInitialState(): DraftSessionState {
   return {
     initialPoolAbilitiesCache: { ultimates: [], standard: [] },
     identifiedHeroModelsCache: [],
+    draftedHeroModelIds: [],
     mySelectedSpotDbId: null,
     mySelectedSpotHeroOrder: null,
     mySelectedModelDbHeroId: null,
@@ -215,6 +226,31 @@ describe('processScanResults', () => {
       expect(updatedState.identifiedHeroModelsCache[0].heroDisplayName).toBe('Lina')
       expect(updatedState.identifiedHeroModelsCache[1].heroDisplayName).toBe('Anti-Mage')
       expect(overlayPayload.heroModels).toHaveLength(2)
+    })
+
+    it('populates top heroes by winrate for the draft', () => {
+      const { overlayPayload } = processScanResults(makeInitialScanInput())
+      expect(overlayPayload.topHeroesByWinrate).toHaveLength(2)
+      expect(overlayPayload.topHeroesByWinrate[0].displayName).toBe('Lina')
+      expect(overlayPayload.topHeroesByWinrate[1].displayName).toBe('Anti-Mage')
+      expect(overlayPayload.topHeroesByWinrate[0].isDrafted).toBe(false)
+    })
+
+    it('resets drafted heroes on initial scan', () => {
+      const input = makeInitialScanInput()
+      input.state.draftedHeroModelIds = [1, 2]
+      const { updatedState, overlayPayload } = processScanResults(input)
+      expect(updatedState.draftedHeroModelIds).toEqual([])
+      expect(overlayPayload.topHeroesByWinrate.every((h) => !h.isDrafted)).toBe(true)
+    })
+
+    it('populates top abilities by winrate on hero models', () => {
+      const { overlayPayload } = processScanResults(makeInitialScanInput())
+      const lina = overlayPayload.heroModels.find((m) => m.heroDisplayName === 'Lina')
+      expect(lina).toBeDefined()
+      expect(lina!.topAbilitiesByWinrate.length).toBeGreaterThan(0)
+      expect(lina!.topAbilitiesByWinrate[0].displayName).toBe('Laguna Blade')
+      expect(lina!.topAbilitiesByWinrate[0].winrate).toBe(0.6)
     })
 
     it('resets user selections on initial scan', () => {

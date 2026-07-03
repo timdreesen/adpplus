@@ -1,6 +1,6 @@
 import { useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { EnrichedScanSlot, HeroModelDisplay, SynergyPairDisplay, HeroSynergyDisplay } from '@shared/types'
+import type { EnrichedScanSlot, HeroModelDisplay, SynergyPairDisplay, HeroSynergyDisplay, HeroTopAbilityDisplay } from '@shared/types'
 
 export type TooltipData =
   | { type: 'ability'; slot: EnrichedScanSlot }
@@ -167,6 +167,11 @@ function HeroTooltipContent({
         {t('tooltip.pickRate', { value: formatPickRate(model.pickRate) })}
       </div>
 
+      <TopSpellsSection
+        title={t('tooltip.topSpells')}
+        items={model.topAbilitiesByWinrate}
+      />
+
       <HeroSynergySection
         title={t('tooltip.strongAbilities')}
         items={model.strongAbilitySynergies}
@@ -194,6 +199,29 @@ function SynergySection({
     <>
       <div className="tooltip-section-title">{title}</div>
       {items.slice(0, MAX_SYNERGIES).map(renderItem)}
+    </>
+  )
+}
+
+function TopSpellsSection({
+  title,
+  items,
+}: {
+  title: string
+  items: HeroTopAbilityDisplay[]
+}): React.ReactElement | null {
+  if (items.length === 0) return null
+  return (
+    <>
+      <div className="tooltip-section-title">{title}</div>
+      {items.map((item, i) => (
+        <div key={i} className="tooltip-combo tooltip-combo-hero">
+          - {item.displayName}{' '}
+          <span className="tooltip-combo-winrate">
+            ({formatWinrate(item.winrate)} WR)
+          </span>
+        </div>
+      ))}
     </>
   )
 }

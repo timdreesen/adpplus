@@ -121,6 +121,15 @@ export interface OverlayDataPayload {
   heroesCoords: SlotCoordinate[]
   heroesParams: { width: number; height: number }
   modelsCoords: SlotCoordinate[]
+  topHeroesByWinrate: TopHeroByWinrateDisplay[]
+  topSpellsByWinrate: HeroTopAbilityDisplay[]
+}
+
+export interface TopHeroByWinrateDisplay {
+  heroId: number
+  displayName: string
+  winrate: number | null
+  isDrafted: boolean
 }
 
 export interface ThirdAbilitySuggestion {
@@ -144,6 +153,11 @@ export interface HeroSynergyDisplay {
   synergyWinrate: number
 }
 
+export interface HeroTopAbilityDisplay {
+  displayName: string
+  winrate: number | null
+}
+
 export interface HeroModelDisplay {
   heroOrder: number
   heroName: string
@@ -154,6 +168,7 @@ export interface HeroModelDisplay {
   consolidatedScore: number
   isGeneralTopTier: boolean
   identificationConfidence: number
+  topAbilitiesByWinrate: HeroTopAbilityDisplay[]
   strongAbilitySynergies: HeroSynergyDisplay[]
   weakAbilitySynergies: HeroSynergyDisplay[]
 }

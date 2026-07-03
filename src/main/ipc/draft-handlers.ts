@@ -3,6 +3,7 @@ import log from 'electron-log/main'
 import type { StoreApi } from 'zustand/vanilla'
 import type { DraftStore } from '../store/draft-store'
 import type { WindowManager } from '../services/window-manager'
+import type { ScanProcessingService } from '../services/scan-processing-service'
 
 // @DEV-GUIDE: Draft domain IPC handlers for "My Spot" and "My Model" selection during overlay.
 // These are fire-and-forget (ipcMain.on) because the renderer doesn't need a response.
@@ -17,6 +18,7 @@ const logger = log.scope('ipc:draft')
 export function registerDraftHandlers(
   store: StoreApi<DraftStore>,
   windowManager: WindowManager,
+  scanProcessingService: ScanProcessingService,
 ): void {
   ipcMain.on(
     'draft:selectMySpot',
@@ -51,6 +53,10 @@ export function registerDraftHandlers(
       const newOrder = isDeselecting ? null : data.heroOrder
 
       state.selectMyModel(newDbId, newOrder)
+      if (!isDeselecting) {
+        state.markHeroDrafted(data.dbHeroId)
+        scanProcessingService.refreshTopHeroesPanel()
+      }
       logger.info('My Model selection changed', {
         dbHeroId: newDbId,
         heroOrder: newOrder,
@@ -61,6 +67,13 @@ export function registerDraftHandlers(
       })
     },
   )
+
+  ipcMain.on('draft:toggleHeroDrafted', (_event, data: { dbHeroId: number }) => {
+    const state = store.getState()
+    state.toggleHeroDrafted(data.dbHeroId)
+    scanProcessingService.refreshTopHeroesPanel()
+    logger.info('Hero drafted status toggled', { dbHeroId: data.dbHeroId })
+  })
 
   logger.info('Draft IPC handlers registered')
 }

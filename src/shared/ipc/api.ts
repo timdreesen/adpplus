@@ -98,6 +98,7 @@ export interface IpcSendMap {
   'ml:scan': { heroOrder: number; isInitialScan: boolean }
   'draft:selectMySpot': { heroOrder: number; dbHeroId: number }
   'draft:selectMyModel': { heroOrder: number; dbHeroId: number }
+  'draft:toggleHeroDrafted': { dbHeroId: number }
   'app:openExternal': { url: string }
   'app:checkUpdate': void
   'app:downloadUpdate': void

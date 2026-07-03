@@ -4,7 +4,9 @@ import type {
   OverlayDataPayload,
   HeroModelDisplay,
   HeroSpotDisplay,
+  HeroTopAbilityDisplay,
   SlotCoordinate,
+  AbilityDetail,
 } from '@shared/types'
 import type { InitialScanResults } from '@shared/types/ml'
 import type {
@@ -27,6 +29,8 @@ import {
   filterRelevantHeroTraps,
 } from './op-trap-filter'
 import { determineTopTierEntities } from './top-tier'
+import { getTopHeroesByWinrate } from './top-heroes-by-winrate'
+import { NUM_TOP_SPELLS_BY_WINRATE } from '@shared/constants/thresholds'
 
 // @DEV-GUIDE: Central business logic — transforms raw ML scan results into a fully-enriched
 // OverlayDataPayload for the overlay UI. This is pure TypeScript with ZERO Electron imports.
@@ -100,6 +104,7 @@ export function processScanResults(
     state.mySelectedSpotHeroOrder = null
     state.mySelectedModelDbHeroId = null
     state.mySelectedModelHeroOrder = null
+    state.draftedHeroModelIds = []
 
     // Identify hero models from hero-defining abilities
     state.identifiedHeroModelsCache = identifyHeroModels(
@@ -346,11 +351,19 @@ export function processScanResults(
     heroModelSynergyMap,
     topTierLookup,
     allScoredEntities,
+    deps.abilities.getByHeroId,
   )
 
   const heroesForMySpotUI = buildHeroesForMySpotUI(
     state.identifiedHeroModelsCache,
   )
+
+  const topHeroesByWinrate = getTopHeroesByWinrate(
+    state.identifiedHeroModelsCache,
+    new Set(state.draftedHeroModelIds),
+  )
+
+  const topSpellsByWinrate = deps.abilities.getTopByWinrate(NUM_TOP_SPELLS_BY_WINRATE)
 
   // --- Phase 14: Assemble overlay payload ---
   const overlayPayload: OverlayDataPayload = {
@@ -373,6 +386,8 @@ export function processScanResults(
     heroesCoords,
     heroesParams,
     modelsCoords: modelCoords,
+    topHeroesByWinrate,
+    topSpellsByWinrate,
   }
 
   return { overlayPayload, updatedState: state }
@@ -391,6 +406,7 @@ function cloneState(state: DraftSessionState): DraftSessionState {
       standard: [...state.initialPoolAbilitiesCache.standard],
     },
     identifiedHeroModelsCache: [...state.identifiedHeroModelsCache],
+    draftedHeroModelIds: [...state.draftedHeroModelIds],
     mySelectedSpotDbId: state.mySelectedSpotDbId,
     mySelectedSpotHeroOrder: state.mySelectedSpotHeroOrder,
     mySelectedModelDbHeroId: state.mySelectedModelDbHeroId,
@@ -543,13 +559,31 @@ function makeUnknownSlot(slot: ScanResult): EnrichedScanSlot {
   }
 }
 
+function getTopAbilitiesByWinrate(
+  dbHeroId: number | null,
+  getByHeroId: (heroId: number) => AbilityDetail[],
+  limit = 4,
+): HeroTopAbilityDisplay[] {
+  if (dbHeroId === null) return []
+
+  return getByHeroId(dbHeroId)
+    .filter((ability) => ability.winrate !== null)
+    .sort((a, b) => (b.winrate ?? 0) - (a.winrate ?? 0))
+    .slice(0, limit)
+    .map((ability) => ({
+      displayName: ability.displayName,
+      winrate: ability.winrate,
+    }))
+}
+
 // @DEV-GUIDE: Converts identified hero models into HeroModelDisplay objects for overlay.
-// Attaches synergy lists (strong/weak ability partners) and top-tier flags.
+// Attaches synergy lists (strong/weak ability partners), top spells by winrate, and top-tier flags.
 function enrichHeroModels(
   heroModels: IdentifiedHeroModel[],
   heroModelSynergyMap: HeroSynergyMap,
   topTierLookup: Map<string, import('./types').TopTierEntity>,
   allScoredEntities: ScoredEntity[],
+  getByHeroId: (heroId: number) => AbilityDetail[],
 ): HeroModelDisplay[] {
   return heroModels.map((model) => {
     const scored = allScoredEntities.find(
@@ -571,6 +605,7 @@ function enrichHeroModels(
       ),
       isGeneralTopTier: topTier?.isGeneralTopTier ?? false,
       identificationConfidence: model.identificationConfidence,
+      topAbilitiesByWinrate: getTopAbilitiesByWinrate(model.dbHeroId, getByHeroId),
       strongAbilitySynergies: synergies?.strong ?? [],
       weakAbilitySynergies: synergies?.weak ?? [],
     }

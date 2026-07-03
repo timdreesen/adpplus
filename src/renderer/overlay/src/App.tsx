@@ -6,6 +6,8 @@ import { ConfirmModal } from './components/ConfirmModal'
 import { StatusToast } from './components/StatusToast'
 import { HotspotLayer } from './components/HotspotLayer'
 import { CombinationPanel } from './components/CombinationPanel'
+import { TopHeroesPanel } from './components/TopHeroesPanel'
+import { TopSpellsPanel } from './components/TopSpellsPanel'
 import { DynamicButtons } from './components/DynamicButtons'
 import { useAppStore } from './hooks/use-app-store'
 import i18n from './i18n'
@@ -44,6 +46,13 @@ function App(): React.ReactElement {
   const [showReportConfirm, setShowReportConfirm] = useState(false)
   const [opPanelVisible, setOpPanelVisible] = useState(true)
   const [trapPanelVisible, setTrapPanelVisible] = useState(true)
+  const [topHeroesPanelVisible, setTopHeroesPanelVisible] = useState(true)
+  const [topSpellsPanelVisible, setTopSpellsPanelVisible] = useState(true)
+
+  const showTopSpellsPanel =
+    overlayData &&
+    !overlayData.scanData &&
+    overlayData.topSpellsByWinrate.length > 0
 
   // Escape key closes overlay
   useEffect(() => {
@@ -163,6 +172,24 @@ function App(): React.ReactElement {
             heroSynergies={overlayData.heroTraps}
             visible={trapPanelVisible}
             onToggle={() => setTrapPanelVisible((v) => !v)}
+          />
+        )}
+
+        {/* Top Spells by Winrate Panel (pre-scan) */}
+        {showTopSpellsPanel && (
+          <TopSpellsPanel
+            spells={overlayData.topSpellsByWinrate}
+            visible={topSpellsPanelVisible}
+            onToggle={() => setTopSpellsPanelVisible((v) => !v)}
+          />
+        )}
+
+        {/* Top Heroes by Winrate Panel (post-scan) */}
+        {overlayData?.scanData && overlayData.topHeroesByWinrate.length > 0 && (
+          <TopHeroesPanel
+            heroes={overlayData.topHeroesByWinrate}
+            visible={topHeroesPanelVisible}
+            onToggle={() => setTopHeroesPanelVisible((v) => !v)}
           />
         )}
       </div>

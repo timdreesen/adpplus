@@ -59,6 +59,8 @@ function makeOverlayPayload(overrides: Partial<OverlayDataPayload> = {}): Overla
     heroesCoords: [],
     heroesParams: { width: 358, height: 170 },
     modelsCoords: [],
+    topHeroesByWinrate: [],
+    topSpellsByWinrate: [],
     ...overrides,
   }
 }

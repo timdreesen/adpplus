@@ -67,6 +67,7 @@ export interface IdentifiedHeroModel {
 export interface DraftSessionState {
   initialPoolAbilitiesCache: { ultimates: ScanResult[]; standard: ScanResult[] }
   identifiedHeroModelsCache: IdentifiedHeroModel[]
+  draftedHeroModelIds: number[]
   mySelectedSpotDbId: number | null
   mySelectedSpotHeroOrder: number | null
   mySelectedModelDbHeroId: number | null
@@ -94,6 +95,8 @@ export interface HeroLookup {
 
 export interface AbilityLookup {
   getDetails(names: string[]): Map<string, AbilityDetail>
+  getByHeroId(heroId: number): AbilityDetail[]
+  getTopByWinrate(limit: number): import('@shared/types').HeroTopAbilityDisplay[]
 }
 
 export interface SynergyLookup {

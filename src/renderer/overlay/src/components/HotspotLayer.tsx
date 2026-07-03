@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import type { EnrichedScanSlot, HeroModelDisplay, OverlayDataPayload } from '@shared/types'
 import { AbilityHotspot } from './AbilityHotspot'
 import { HeroModelHotspot } from './HeroModelHotspot'
+import { HeroPortraitHotspot } from './HeroPortraitHotspot'
 import { Tooltip, type TooltipData } from './Tooltip'
 
 interface HotspotLayerProps {
@@ -43,10 +44,28 @@ export function HotspotLayer({
 
   if (!overlayData.scanData) return null
 
-  const { scanData, scaleFactor, heroModels, modelsCoords } = overlayData
+  const { scanData, scaleFactor, heroModels, modelsCoords, heroesCoords, heroesParams } = overlayData
 
   return (
     <>
+      {/* Hero portrait hotspots (full hero area) */}
+      {heroModels.map((model) => {
+        const heroCoord = heroesCoords.find((c) => c.hero_order === model.heroOrder)
+        if (!heroCoord) return null
+        return (
+          <HeroPortraitHotspot
+            key={`hero-portrait-${model.heroOrder}`}
+            model={model}
+            heroCoord={heroCoord}
+            heroesParams={heroesParams}
+            scaleFactor={scaleFactor}
+            tooltipVisible={tooltipVisible}
+            onHover={handleHeroHover}
+            onLeave={handleLeave}
+          />
+        )
+      })}
+
       {/* Ultimate ability hotspots */}
       {scanData.ultimates.map((slot, i) => (
         <AbilityHotspot

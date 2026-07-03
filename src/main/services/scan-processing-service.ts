@@ -4,9 +4,10 @@ import type { DraftStore } from '../store/draft-store'
 import type { DatabaseService } from './database-service'
 import type { LayoutService } from './layout-service'
 import type { WindowManager } from './window-manager'
-import type { ScanResult } from '@shared/types'
+import type { ScanResult, OverlayDataPayload } from '@shared/types'
 import type { InitialScanResults } from '@shared/types/ml'
 import { processScanResults } from '@core/domain/scan-processor'
+import { getTopHeroesByWinrate } from '@core/domain/top-heroes-by-winrate'
 
 // @DEV-GUIDE: Bridges ML scan results to the overlay UI. After the ML worker returns raw
 // ability/hero detections, this service:
@@ -21,6 +22,8 @@ import { processScanResults } from '@core/domain/scan-processor'
 
 const logger = log.scope('scan-processing')
 
+let lastOverlayPayload: OverlayDataPayload | null = null
+
 export interface ScanProcessingService {
   handleScanResults(
     results: InitialScanResults | ScanResult[],
@@ -28,6 +31,7 @@ export interface ScanProcessingService {
     resolution: string,
     scaleFactor: number,
   ): void
+  refreshTopHeroesPanel(): void
 }
 
 export function createScanProcessingService(
@@ -55,6 +59,7 @@ export function createScanProcessingService(
           state: {
             initialPoolAbilitiesCache: state.initialPoolAbilitiesCache,
             identifiedHeroModelsCache: state.identifiedHeroModelsCache,
+            draftedHeroModelIds: state.draftedHeroModelIds,
             mySelectedSpotDbId: state.mySelectedSpotDbId,
             mySelectedSpotHeroOrder: state.mySelectedSpotHeroOrder,
             mySelectedModelDbHeroId: state.mySelectedModelDbHeroId,
@@ -80,6 +85,7 @@ export function createScanProcessingService(
             output.updatedState.initialPoolAbilitiesCache,
           identifiedHeroModelsCache:
             output.updatedState.identifiedHeroModelsCache,
+          draftedHeroModelIds: output.updatedState.draftedHeroModelIds,
           mySelectedSpotDbId: output.updatedState.mySelectedSpotDbId,
           mySelectedSpotHeroOrder: output.updatedState.mySelectedSpotHeroOrder,
           mySelectedModelDbHeroId: output.updatedState.mySelectedModelDbHeroId,
@@ -88,15 +94,8 @@ export function createScanProcessingService(
         })
 
         // Broadcast enriched data to both windows
-        const overlay = windowManager.getOverlayWindow()
-        if (overlay && !overlay.isDestroyed()) {
-          overlay.webContents.send('overlay:data', output.overlayPayload)
-        }
-
-        const cp = windowManager.getControlPanelWindow()
-        if (cp && !cp.isDestroyed()) {
-          cp.webContents.send('overlay:data', output.overlayPayload)
-        }
+        lastOverlayPayload = output.overlayPayload
+        broadcastOverlayPayload(windowManager, output.overlayPayload)
 
         const durationMs = Math.round(performance.now() - start)
         logger.info('Scan processing complete', { durationMs, isInitialScan })
@@ -105,5 +104,36 @@ export function createScanProcessingService(
         logger.error('Scan processing failed', { error: message })
       }
     },
+
+    refreshTopHeroesPanel() {
+      if (!lastOverlayPayload) return
+
+      const state = store.getState()
+      const topHeroesByWinrate = getTopHeroesByWinrate(
+        state.identifiedHeroModelsCache,
+        new Set(state.draftedHeroModelIds),
+      )
+
+      lastOverlayPayload = {
+        ...lastOverlayPayload,
+        topHeroesByWinrate,
+      }
+      broadcastOverlayPayload(windowManager, lastOverlayPayload)
+    },
+  }
+}
+
+function broadcastOverlayPayload(
+  windowManager: WindowManager,
+  payload: OverlayDataPayload,
+): void {
+  const overlay = windowManager.getOverlayWindow()
+  if (overlay && !overlay.isDestroyed()) {
+    overlay.webContents.send('overlay:data', payload)
+  }
+
+  const cp = windowManager.getControlPanelWindow()
+  if (cp && !cp.isDestroyed()) {
+    cp.webContents.send('overlay:data', payload)
   }
 }

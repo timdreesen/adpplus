@@ -12,6 +12,7 @@ export {
   filterRelevantHeroTraps,
 } from './op-trap-filter'
 export { determineTopTierEntities } from './top-tier'
+export { getTopHeroesByWinrate } from './top-heroes-by-winrate'
 export { processScanResults } from './scan-processor'
 export type { ScanProcessorInput, ScanProcessorOutput } from './scan-processor'
 export type {

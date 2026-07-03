@@ -113,7 +113,7 @@ export function useOverlayData(): OverlayState & {
     setScanError(null)
     setSelectedSpotHeroOrder(null)
     setSelectedModelHeroOrder(null)
-    setOverlayData((prev) => prev ? { ...prev, scanData: null, opCombinations: [], trapCombinations: [], heroSynergies: [], heroTraps: [], heroModels: [], heroesForMySpotUI: [] } : null)
+    setOverlayData((prev) => prev ? { ...prev, scanData: null, opCombinations: [], trapCombinations: [], heroSynergies: [], heroTraps: [], heroModels: [], heroesForMySpotUI: [], topHeroesByWinrate: [] } : null)
   }
 
   return {

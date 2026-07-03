@@ -18,6 +18,7 @@ import type { IdentifiedHeroModel } from '@core/domain/types'
 export interface DraftSessionSlice {
   initialPoolAbilitiesCache: { ultimates: ScanResult[]; standard: ScanResult[] }
   identifiedHeroModelsCache: IdentifiedHeroModel[]
+  draftedHeroModelIds: number[]
   mySelectedSpotDbId: number | null
   mySelectedSpotHeroOrder: number | null
   mySelectedModelDbHeroId: number | null
@@ -33,6 +34,8 @@ export interface DraftStoreActions {
   setHeroModelsCache(models: IdentifiedHeroModel[]): void
   selectMySpot(dbHeroId: number | null, heroOrder: number | null): void
   selectMyModel(dbHeroId: number | null, heroOrder: number | null): void
+  markHeroDrafted(dbHeroId: number): void
+  toggleHeroDrafted(dbHeroId: number): void
 }
 
 export type DraftStore = DraftSessionSlice & DraftStoreActions
@@ -42,6 +45,7 @@ export function createDraftStore() {
     // Initial state
     initialPoolAbilitiesCache: { ultimates: [], standard: [] },
     identifiedHeroModelsCache: [],
+    draftedHeroModelIds: [],
     mySelectedSpotDbId: null,
     mySelectedSpotHeroOrder: null,
     mySelectedModelDbHeroId: null,
@@ -52,6 +56,7 @@ export function createDraftStore() {
       set({
         initialPoolAbilitiesCache: { ultimates: [], standard: [] },
         identifiedHeroModelsCache: [],
+        draftedHeroModelIds: [],
         mySelectedSpotDbId: null,
         mySelectedSpotHeroOrder: null,
         mySelectedModelDbHeroId: null,
@@ -74,5 +79,19 @@ export function createDraftStore() {
         mySelectedModelDbHeroId: dbHeroId,
         mySelectedModelHeroOrder: heroOrder,
       }),
+
+    markHeroDrafted: (dbHeroId) =>
+      set((state) => ({
+        draftedHeroModelIds: state.draftedHeroModelIds.includes(dbHeroId)
+          ? state.draftedHeroModelIds
+          : [...state.draftedHeroModelIds, dbHeroId],
+      })),
+
+    toggleHeroDrafted: (dbHeroId) =>
+      set((state) => ({
+        draftedHeroModelIds: state.draftedHeroModelIds.includes(dbHeroId)
+          ? state.draftedHeroModelIds.filter((id) => id !== dbHeroId)
+          : [...state.draftedHeroModelIds, dbHeroId],
+      })),
   }))
 }

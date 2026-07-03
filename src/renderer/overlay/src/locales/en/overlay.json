@@ -32,6 +32,17 @@
     "hide": "Hide",
     "tripletTooltip": "Often drafted as a triplet ({{winrate}} WR together)"
   },
+  "topHeroes": {
+    "title": "Top Heroes",
+    "show": "Show Heroes",
+    "hide": "Hide",
+    "toggleDrafted": "Click to mark as drafted / available"
+  },
+  "topSpells": {
+    "title": "Top Spells by Winrate",
+    "show": "Show Top Spells",
+    "hide": "Hide"
+  },
   "mySpot": "My Spot",
   "changeMySpot": "Change",
   "myModel": "My Model",
@@ -48,6 +59,7 @@
     "topModel": "Top Model",
     "yourModelPick": "Your Model Pick",
     "strongAbilities": "Strong Abilities for This Hero",
-    "weakAbilities": "Weak Abilities for This Hero"
+    "weakAbilities": "Weak Abilities for This Hero",
+    "topSpells": "Top Spells by Winrate"
   }
 }

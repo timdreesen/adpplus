@@ -166,6 +166,14 @@ body {
   background-color: rgba(130, 134, 140, 0.98);
 }
 
+.overlay-btn-blue {
+  background-color: rgba(41, 78, 122, 0.85);
+  border-color: rgba(60, 100, 150, 0.9);
+}
+.overlay-btn-blue:hover {
+  background-color: rgba(51, 88, 132, 0.98);
+}
+
 /* ============================================================
    Confirm Modal
    ============================================================ */
@@ -268,7 +276,8 @@ body {
    Hotspot Base Styles
    ============================================================ */
 .ability-hotspot,
-.hero-model-hotspot {
+.hero-model-hotspot,
+.hero-portrait-hotspot {
   position: absolute;
   box-sizing: border-box;
   pointer-events: auto;
@@ -504,6 +513,149 @@ body {
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.3);
   margin: 8px 0;
+}
+
+/* ============================================================
+   Top Heroes Panel
+   ============================================================ */
+.top-heroes-panel {
+  z-index: 9999;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  color: #e8e8e8;
+  font-size: 13px;
+  opacity: 0.92;
+  padding: 14px;
+  transition: all 0.2s ease-in-out;
+  width: 260px;
+  will-change: transform;
+  background: linear-gradient(135deg, rgba(30, 58, 95, 0.95) 0%, rgba(41, 78, 122, 0.92) 100%);
+  border: 1px solid rgba(60, 100, 150, 0.8);
+}
+
+.top-heroes-panel:hover {
+  opacity: 1;
+}
+
+.top-heroes-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: -14px -14px 10px -14px;
+  padding: 10px 12px;
+  border-radius: 4px 4px 0 0;
+  border-bottom: 2px solid rgba(60, 100, 150, 0.6);
+  background: linear-gradient(to right, rgba(30, 58, 95, 0.5), rgba(41, 78, 122, 0.3));
+}
+
+.top-heroes-panel-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #A8C8E8;
+}
+
+.top-heroes-panel-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 5px;
+  padding: 4px 5px;
+  font-size: 12px;
+  color: #d0d0d0;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.top-heroes-panel-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.top-heroes-panel-name {
+  font-weight: 500;
+  color: #8BB8E8;
+}
+
+.top-heroes-panel-wr {
+  color: #a8b2bc;
+  font-size: 11px;
+}
+
+.top-heroes-panel-item-drafted .top-heroes-panel-name,
+.top-heroes-panel-item-drafted .top-heroes-panel-wr {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+/* ============================================================
+   Top Spells Panel
+   ============================================================ */
+.top-spells-panel {
+  z-index: 9999;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  color: #e8e8e8;
+  font-size: 13px;
+  opacity: 0.92;
+  padding: 14px;
+  transition: all 0.2s ease-in-out;
+  width: 260px;
+  will-change: transform;
+  background: linear-gradient(135deg, rgba(25, 70, 50, 0.95) 0%, rgba(33, 145, 128, 0.92) 100%);
+  border: 1px solid rgba(45, 170, 150, 0.8);
+}
+
+.top-spells-panel:hover {
+  opacity: 1;
+}
+
+.top-spells-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: -14px -14px 10px -14px;
+  padding: 10px 12px;
+  border-radius: 4px 4px 0 0;
+  border-bottom: 2px solid rgba(45, 170, 150, 0.6);
+  background: linear-gradient(to right, rgba(25, 70, 50, 0.5), rgba(33, 145, 128, 0.3));
+}
+
+.top-spells-panel-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #A8E8D8;
+}
+
+.top-spells-panel-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+  padding: 4px 5px;
+  font-size: 12px;
+  color: #d0d0d0;
+}
+
+.top-spells-panel-rank {
+  color: #7ec8b8;
+  font-weight: 600;
+  min-width: 18px;
+}
+
+.top-spells-panel-name {
+  flex: 1;
+  font-weight: 500;
+  color: #8BE8D0;
+}
+
+.top-spells-panel-wr {
+  color: #a8b2bc;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 /* ============================================================

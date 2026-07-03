@@ -12,6 +12,7 @@ export const WEIGHT_PICK_ORDER = 0.6
 export const MIN_PICK_ORDER_FOR_NORMALIZATION = 1.0
 export const MAX_PICK_ORDER_FOR_NORMALIZATION = 50.0
 export const NUM_TOP_TIER_SUGGESTIONS = 10
+export const NUM_TOP_SPELLS_BY_WINRATE = 10
 
 // Default thresholds
 export const DEFAULT_OP_THRESHOLD = 0.13
