@@ -1,3 +1,13 @@
+## New Features in This Fork
+
+- **Top Heroes & Top Spells panels** — ranked overlay panels showing the best heroes and abilities by win rate in the current draft pool
+- **Hero spell tooltips** — hover hero portraits to see each hero's top four spells by win rate
+- **Melee & ranged win rates** — ability tooltips show overall, melee, and ranged win rates derived from Windrun hero-model data
+- **Auto-detect picked heroes** — rescan compares hero model slots against the initial scan to update drafted status without manual toggles
+- **Picked ability tracking on rescan** — Rescan Picks ML-scans ability slots and crosses out drafted abilities across tooltips, OP/trap panels, and top lists
+
+---
+
 # Dota 2 Ability Draft Plus
 
 AI-powered overlay for Dota 2's Ability Draft mode. Scans the draft board using machine learning, identifies all abilities in the pool, and displays real-time synergy recommendations directly on your game screen.
