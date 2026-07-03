@@ -31,6 +31,8 @@ asarUnpack:
   - "**/node_modules/screenshot-desktop/**"
 win:
   icon: "build/icon.ico"
+  # Unsigned local builds: skip winCodeSign (needs symlink privileges on Windows).
+  signAndEditExecutable: false
   target:
     - target: nsis
       arch:

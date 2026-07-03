@@ -19,7 +19,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
-    "build:dist": "npm run build && electron-builder --win"
+    "build:dist": "npm run build && electron-builder --win",
+    "build:portable": "npm run build && electron-builder --win portable"
   },
   "dependencies": {
     "@sentry/electron": "^7.8.0",
