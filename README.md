@@ -50,7 +50,7 @@ AI-powered overlay for Dota 2's Ability Draft mode. Scans the draft board using 
 
 ### From Release (Recommended)
 
-1. Download the latest installer from [Releases](https://github.com/Tiarin-Hino/ability-draft-plus/releases)
+1. Download the latest installer from [Releases](https://github.com/timdreesen/adpplus/releases)
 2. Run the installer -- choose your install directory
 3. Launch **Dota 2 Ability Draft Plus** from the Start Menu or Desktop shortcut
 

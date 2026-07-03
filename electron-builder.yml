@@ -46,5 +46,5 @@ nsis:
   createStartMenuShortcut: true
 publish:
   provider: github
-  owner: tiarin-hino
-  repo: ability-draft-plus
+  owner: timdreesen
+  repo: adpplus
